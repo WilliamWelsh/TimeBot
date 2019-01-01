@@ -112,7 +112,7 @@ namespace TimeBot
 
             if (!Countries.Contains(country, StringComparer.CurrentCultureIgnoreCase))
             {
-                await PrintError(channel, "Country not valid. Please try again.\n\nExamples: `!country set united states` or `!country set united kingdom` or `!country set canada`");
+                await PrintError(channel, "Country not valid. Please try again.\n\nExamples:\n`!country set united states`\n`!country set united kingdom`\n`!country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt");
                 return;
             }
 
@@ -137,10 +137,17 @@ namespace TimeBot
                 .WithTitle("Time Bot Help")
                 .WithColor(embedColor)
                 .WithDescription($"Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
-                .AddField("Commands", "`!timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`!time @mentionedUser` View a user's local time.\n`!time set [number]` Set your local time.\n`!country set [country name]`Set your country.")
+                .AddField("Commands", "`!timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`!time @mentionedUser` View a user's local time.\n`!time set [number]` Set your local time.\n`!country set [country name]`Set your country.\n`!timeinvite` Get an invite link for the bot.")
                 .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/qsc8YMS) for additional help.")
-                .AddField("GitHub", "TODO")
+                .AddField("GitHub", "https://github.com/WilliamWelsh/TimeBot")
                 .Build());
+        }
+
+        // Get Invite Link
+        public async Task DMInviteLink(ISocketMessageChannel channel, SocketUser user)
+        {
+            await user.SendMessageAsync("https://discordapp.com/api/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot");
+            await PrintSuccessMessage(channel, "The invite linked has been DMed to you!");
         }
     }
 }

@@ -18,6 +18,10 @@ namespace TimeBot
         [Command("timesetup")]
         public async Task DisplayTimeSetup() => await Config.StatsHandler.DisplayTimeSetup(Context.Channel);
 
+        // Tutorial on how to set time and country
+        [Command("timeinvite")]
+        public async Task DMInvite() => await Config.StatsHandler.DMInviteLink(Context.Channel, Context.User);
+
         // Display time (and possible country) for a user
         [Command("time")]
         public async Task DisplayStatsForUser(SocketGuildUser user = null) => await Config.StatsHandler.DisplayStats(Context.Channel, user ?? (SocketGuildUser)Context.User);
