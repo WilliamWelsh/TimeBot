@@ -4,7 +4,8 @@ This bot can provide the local time and country for a user. All they have to do 
 
 ## Commands
 #### Main Command
-`!time` View the time (and possibly country) of a user.
+`!time` View or set up your time and/or country.  
+`!time @mentionedUser` View the time (and possibly country) of a user.
 ##### Setup
 `!timesetup` Tutorial on how to set up time and country.  
 `!time set [hour]` Set your local time.  
@@ -16,4 +17,5 @@ This bot can provide the local time and country for a user. All they have to do 
 
 ## Images
 ![Example](https://i.imgur.com/VynC3uB.png)  
+![ExampleTwo](https://i.imgur.com/NKXpsI5.png)    
 ![setup](https://i.imgur.com/LBiQPXy.png)

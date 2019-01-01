@@ -1,13 +1,6 @@
-﻿using System;
-using Discord;
-using System.Text;
-using System.Linq;
-using TimeBot.UserData;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace TimeBot
 {

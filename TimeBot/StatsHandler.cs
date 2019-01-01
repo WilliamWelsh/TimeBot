@@ -1,12 +1,12 @@
-﻿using Discord;
+﻿using System;
+using Discord;
+using System.IO;
+using System.Text;
+using System.Linq;
 using TimeBot.UserData;
 using Discord.WebSocket;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.IO;
 
 namespace TimeBot
 {
@@ -22,9 +22,7 @@ namespace TimeBot
         // The main embed that displays time for a user
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private Embed statsEmbed(UserAccount account, SocketGuildUser user)
-        {
-            var embed = new EmbedBuilder()
+        private Embed statsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(user.Nickname ?? user.Username)
                 .WithIconUrl(user.GetAvatarUrl()))
@@ -32,8 +30,6 @@ namespace TimeBot
                 .WithColor(embedColor)
                 .WithFooter(GetCountry(account, user))
                 .Build();
-            return embed;
-        }
 
         // Display a User's local time
         private string GetTime(UserAccount account, SocketGuildUser user)
@@ -65,32 +61,19 @@ namespace TimeBot
                 .Build());
         }
 
-        // Display an error message
-        private async Task PrintError(ISocketMessageChannel channel, string errorMessage)
-        {
-            await channel.SendMessageAsync("", false, new EmbedBuilder()
-                .WithTitle("Error")
-                .WithColor(errorColor)
-                .WithDescription(errorMessage)
-                .Build());
-        }
-
-        // Display a success message
-        private async Task PrintSuccessMessage(ISocketMessageChannel channel, string message)
-        {
-            await channel.SendMessageAsync("", false, new EmbedBuilder()
-                .WithTitle("Success")
-                .WithColor(successColor)
+        // Print a basic embed, like an error message or success message
+        private async Task PrintBasicEmbed(ISocketMessageChannel channel, string title, string message, Color color) => await channel.SendMessageAsync("", false, new EmbedBuilder()
+                .WithTitle(title)
+                .WithColor(color)
                 .WithDescription(message)
                 .Build());
-        }
 
         // Set the time for yourself
         public async Task SetTime(ISocketMessageChannel channel, SocketUser user, int hourDifference)
         {
             if (hourDifference < -7 || hourDifference > 16)
             {
-                await PrintError(channel, "Invalid hour difference. The input must be between -7 and 16. Please run `!timesetup` for more help.");
+                await PrintBasicEmbed(channel, "Error", "Invalid hour difference. The input must be between -7 and 16. Please run `!timesetup` for more help.", errorColor);
                 return;
             }
 
@@ -98,7 +81,7 @@ namespace TimeBot
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
-            await PrintSuccessMessage(channel, $"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)user)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+            await PrintBasicEmbed(channel, "Success", $"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)user)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.", successColor);
         }
 
         // Set the country for yourself
@@ -106,13 +89,13 @@ namespace TimeBot
         {
             if (string.IsNullOrEmpty(country))
             {
-                await PrintError(channel, "The country name cannot be empty.\n\nSuccessful Example: `!country set United States`");
+                await PrintBasicEmbed(channel, "Error", "The country name cannot be empty.\n\nSuccessful Example: `!country set United States`", errorColor);
                 return;
             }
 
             if (!Countries.Contains(country, StringComparer.CurrentCultureIgnoreCase))
             {
-                await PrintError(channel, "Country not valid. Please try again.\n\nExamples:\n`!country set united states`\n`!country set united kingdom`\n`!country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt");
+                await PrintBasicEmbed(channel, "Error", "Country not valid. Please try again.\n\nExamples:\n`!country set united states`\n`!country set united kingdom`\n`!country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt", errorColor);
                 return;
             }
 
@@ -124,16 +107,14 @@ namespace TimeBot
             account.country = country;
             UserAccounts.SaveAccounts();
 
-            await PrintSuccessMessage(channel, $"You have successfully set your country to {country}.\n\nIf this is an error, you can run `!country set [country name]` again.");
+            await PrintBasicEmbed(channel, "Success", $"You have successfully set your country to {country}.\n\nIf this is an error, you can run `!country set [country name]` again.", successColor);
         }
 
         // Set up the countries list to the list of valid countries in countries.txt
         public void SetupCountryList() => Countries = File.ReadAllLines("countries.txt").ToList();
 
         // Help page
-        public async Task DisplayHelp(ISocketMessageChannel channel)
-        {
-            await channel.SendMessageAsync("", false, new EmbedBuilder()
+        public async Task DisplayHelp(ISocketMessageChannel channel) => await channel.SendMessageAsync("", false, new EmbedBuilder()
                 .WithTitle("Time Bot Help")
                 .WithColor(embedColor)
                 .WithDescription($"Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
@@ -141,13 +122,12 @@ namespace TimeBot
                 .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/qsc8YMS) for additional help.")
                 .AddField("GitHub", "https://github.com/WilliamWelsh/TimeBot")
                 .Build());
-        }
 
         // Get Invite Link
         public async Task DMInviteLink(ISocketMessageChannel channel, SocketUser user)
         {
             await user.SendMessageAsync("https://discordapp.com/api/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot");
-            await PrintSuccessMessage(channel, "The invite linked has been DMed to you!");
+            await PrintBasicEmbed(channel, "Success", "The invite linked has been DMed to you!", successColor);
         }
     }
 }
