@@ -19,6 +19,14 @@ namespace TimeBot
         [Command("time")]
         public async Task DisplayStatsForUser(SocketGuildUser user = null) => await Config.StatsHandler.DisplayStats(Context.Channel, user ?? (SocketGuildUser)Context.User);
 
+        // Display time (and possible country) for a user
+        [Command("time")]
+        public async Task DisplayStatsForRole(SocketRole role = null) => await Config.StatsHandler.DisplayStats(Context, role);
+
+        // Display time for everyone
+        [Command("timeall")]
+        public async Task DisplayAllTime() => await Config.StatsHandler.DisplayAllTime(Context);
+
         // Set your time
         [Command("time set")]
         public async Task SetTime(int hourDifference) => await Config.StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);

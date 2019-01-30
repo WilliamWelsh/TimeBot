@@ -7,6 +7,7 @@ using TimeBot.UserData;
 using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace TimeBot
 {
@@ -45,6 +46,25 @@ namespace TimeBot
 
         // Display the time (and possibly country) for a user
         public async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, statsEmbed(UserAccounts.GetAccount(user), user));
+
+        // Display the time for users in a certain role
+        public async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
+        {
+            var Users = Context.Guild.Users;
+            StringBuilder text = new StringBuilder();
+            foreach (var User in Users)
+            {
+                if (User.Roles.Contains(Role))
+                {
+                    var account = UserAccounts.GetAccount(User);
+                    if (account.localTime == 999)
+                        text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
+                    else
+                        text.AppendLine($"{User.Nickname ?? User.Username} - {DateTime.Now.AddHours(account.localTime).ToString("h:mm tt")}");
+                }
+            }
+            await PrintBasicEmbed(Context.Channel, $"Time for {Role}", text.ToString(), Role.Color);
+        }
 
         // Display the !timesetup information
         public async Task DisplayTimeSetup(ISocketMessageChannel channel)
@@ -128,6 +148,39 @@ namespace TimeBot
         {
             await user.SendMessageAsync("https://discordapp.com/api/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot");
             await PrintBasicEmbed(channel, "Success", "The invite linked has been DMed to you!", successColor);
+        }
+
+        // Display Time for everyone (requested feature)
+        public async Task DisplayAllTime(SocketCommandContext Context)
+        {
+            var Users = Context.Guild.Users;
+            StringBuilder text = new StringBuilder();
+            foreach (var User in Users)
+            {
+                var account = UserAccounts.GetAccount(User);
+                if (account.localTime == 999)
+                    text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
+                else
+                    text.AppendLine($"{User.Nickname ?? User.Username} - {DateTime.Now.AddHours(account.localTime).ToString("h:mm tt")}");
+            }
+            if (text.ToString().Length > 2048)
+            {
+                int size = 2048;
+                string str = text.ToString();
+                List<string> strings = new List<string>();
+
+                for (int i = 0; i < str.Length; i += size)
+                {
+                    if (i + size > str.Length)
+                        size = str.Length - i;
+                    strings.Add(str.Substring(i, size));
+                }
+
+                foreach(string s in strings)
+                    await PrintBasicEmbed(Context.Channel, "Time for All", s, embedColor);
+            }
+            else
+                await PrintBasicEmbed(Context.Channel, "Time for All", text.ToString(), embedColor);
         }
     }
 }
