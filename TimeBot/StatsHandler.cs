@@ -157,12 +157,16 @@ namespace TimeBot
             StringBuilder text = new StringBuilder();
             foreach (var User in Users)
             {
-                var account = UserAccounts.GetAccount(User);
-                if (account.localTime == 999)
-                    text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
-                else
-                    text.AppendLine($"{User.Nickname ?? User.Username} - {DateTime.Now.AddHours(account.localTime).ToString("h:mm tt")}");
+                if (!User.IsBot)
+                {
+                    var account = UserAccounts.GetAccount(User);
+                    if (account.localTime == 999)
+                        text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
+                    else
+                        text.AppendLine($"{User.Nickname ?? User.Username} - {DateTime.Now.AddHours(account.localTime).ToString("h:mm tt")}");
+                }
             }
+            
             if (text.ToString().Length > 2048)
             {
                 int size = 2048;
