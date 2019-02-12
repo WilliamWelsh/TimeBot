@@ -23,7 +23,7 @@ namespace TimeBot
         // The main embed that displays time for a user
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private Embed statsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
+        private Embed StatsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(user.Nickname ?? user.Username)
                 .WithIconUrl(user.GetAvatarUrl()))
@@ -45,7 +45,7 @@ namespace TimeBot
         private string GetCountry(UserAccount account, SocketGuildUser user) => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a user
-        public async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, statsEmbed(UserAccounts.GetAccount(user), user));
+        public async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
 
         // Display the time for users in a certain role
         public async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
@@ -92,13 +92,14 @@ namespace TimeBot
         // Set the time for yourself
         public async Task SetTime(ISocketMessageChannel channel, SocketUser user, double hourDifference)
         {
-            if (hourDifference < -7 || hourDifference > 16)
+            if (hourDifference < -24 || hourDifference > 24)
             {
                 await PrintBasicEmbed(channel, "Error", "Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.", errorColor);
                 return;
             }
 
-            if (((int)((decimal)hourDifference % 1 * 100)) != 50 && ((int)((decimal)hourDifference % 1 * 100)) != 0)
+            int minuteDifference = (int)((decimal)hourDifference % 1 * 100);
+            if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
             {
                 await PrintBasicEmbed(channel, "Error", "Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.", errorColor);
                 return;
