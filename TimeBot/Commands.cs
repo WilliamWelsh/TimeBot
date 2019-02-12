@@ -29,7 +29,7 @@ namespace TimeBot
 
         // Set your time
         [Command("time set")]
-        public async Task SetTime(int hourDifference) => await Config.StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);
+        public async Task SetTime(double hourDifference) => await Config.StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);
 
         // Set your country
         [Command("country set")]

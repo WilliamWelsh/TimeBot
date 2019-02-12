@@ -69,10 +69,11 @@ namespace TimeBot
         // Display the !timesetup information
         public async Task DisplayTimeSetup(ISocketMessageChannel channel)
         {
-            StringBuilder description = new StringBuilder();
-            description.AppendLine("To set up your time, please calculate the difference in hours it is from you and my time:").AppendLine();
-            description.AppendLine($"My time: {DateTime.Now.ToString("h:mm tt")}").AppendLine();
-            description.AppendLine("Example, if it's 12 pm for me, and 10 am for you, then type `!time set -2` because the difference is 2 hours.");
+            StringBuilder description = new StringBuilder()
+                .AppendLine("To set up your time, please calculate the difference in hours it is from you and my time:").AppendLine()
+                .AppendLine($"My time: {DateTime.Now.ToString("h:mm tt")}").AppendLine()
+                .AppendLine("Example, if it's 12 pm for me, and 10 am for you, then type `!time set -2` because the difference is 2 hours.").AppendLine()
+                .AppendLine("Example, if it's 12 pm for me, and 1:30 pm for you, then type `!time set 1.5` because the difference is 1 hour and 30 minutes.");
             await channel.SendMessageAsync("", false, new EmbedBuilder()
                 .WithTitle("Stats Setup")
                 .AddField("Time Setup", description.ToString())
@@ -89,11 +90,17 @@ namespace TimeBot
                 .Build());
 
         // Set the time for yourself
-        public async Task SetTime(ISocketMessageChannel channel, SocketUser user, int hourDifference)
+        public async Task SetTime(ISocketMessageChannel channel, SocketUser user, double hourDifference)
         {
             if (hourDifference < -7 || hourDifference > 16)
             {
-                await PrintBasicEmbed(channel, "Error", "Invalid hour difference. The input must be between -7 and 16. Please run `!timesetup` for more help.", errorColor);
+                await PrintBasicEmbed(channel, "Error", "Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.", errorColor);
+                return;
+            }
+
+            if (((int)((decimal)hourDifference % 1 * 100)) != 50 && ((int)((decimal)hourDifference % 1 * 100)) != 0)
+            {
+                await PrintBasicEmbed(channel, "Error", "Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.", errorColor);
                 return;
             }
 
