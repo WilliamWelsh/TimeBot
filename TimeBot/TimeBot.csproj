@@ -144,9 +144,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatsHandler.cs" />
+    <Compile Include="TimeZones.cs" />
     <Compile Include="UserData\DateStorage.cs" />
+    <Compile Include="UserData\Servers.cs" />
     <Compile Include="UserData\UserAccount.cs" />
     <Compile Include="UserData\UserAccounts.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -23,9 +23,13 @@ namespace TimeBot
         [Command("time")]
         public async Task DisplayStatsForRole(SocketRole role = null) => await Config.StatsHandler.DisplayStats(Context, role);
 
-        // Display time for everyone
+        // Display everyone's current time
         [Command("timeall")]
-        public async Task DisplayAllTime() => await Config.StatsHandler.DisplayAllTime(Context);
+        public async Task DisplayEveryonesTime() => await Config.StatsHandler.DisplayEveryonesTime(Context);
+
+        // Display everyone's country
+        [Command("countryall")]
+        public async Task DisplayEveryonesCountry() => await Config.StatsHandler.DisplayEveryonesCountry(Context);
 
         // Set your time
         [Command("time set")]
@@ -38,5 +42,20 @@ namespace TimeBot
         // Help menu
         [Command("timehelp")]
         public async Task DisplayHelp() => await Config.StatsHandler.DisplayHelp(Context.Channel);
+
+        // TODO: Finish this
+        [Command("timestats")]
+        public async Task TimeStats() => await Config.StatsHandler.DisplayUserStats(Context);
+
+        // View the server time
+        [Command("time server")]
+        public async Task TimeServer()
+        {
+            var server = UserData.Servers.GetServer(Context.Guild);
+        }
+
+        // Set the server time
+        [Command("time set server")]
+        public async Task TryToSetServerTime() => await Config.StatsHandler.TryToSetUpServerTime(Context);
     }
 }
