@@ -1,6 +1,5 @@
 ﻿using System;
 using Discord;
-using System.Linq;
 using Discord.Commands;
 using System.Reflection;
 using Discord.WebSocket;
@@ -32,19 +31,13 @@ namespace TimeBot
 
         private async Task HandleCommandAsync(SocketMessage s)
         {
-            SocketUserMessage msg = s as SocketUserMessage;
-            if (msg == null || msg.Author.IsBot) return;
+            if (!(s is SocketUserMessage msg) || msg.Author.IsBot) return;
 
             var context = new SocketCommandContext(_client, msg);
 
             int argPos = 0;
             if (msg.HasStringPrefix("!", ref argPos))
                 await _service.ExecuteAsync(context, argPos, null, MultiMatchHandling.Exception);
-
-            string m = msg.Content.ToLower();
-
-            if (s.Channel.Name.StartsWith("@"))
-                Console.WriteLine($" ----------\n DIRECT MESSAGE\n From: {s.Channel}\n {s}\n ----------");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace TimeBot.UserData
     {
         private static List<UserAccount> accounts;
 
-        private static string accountsFile = "Resources/user_data.json";
+        private static readonly string accountsFile = "Resources/user_data.json";
 
         static UserAccounts()
         {
@@ -38,7 +38,7 @@ namespace TimeBot.UserData
 
         private static UserAccount CreateUserAccount(ulong id)
         {
-            var newAccount = new UserAccount()
+            var newAccount = new UserAccount
             {
                 userID = id,
                 localTime = 999,

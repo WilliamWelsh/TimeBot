@@ -4,21 +4,21 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using TimeBot.UserData;
-using Discord.WebSocket;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Discord.Commands;
+using Discord.WebSocket;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TimeBot
 {
-    public class StatsHandler
+    public static class StatsHandler
     {
-        private List<string> Countries;
+        private static List<string> Countries;
 
         // The main embed that displays time for a user
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private Embed StatsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
+        private static Embed StatsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(user.Nickname ?? user.Username)
                 .WithIconUrl(user.GetAvatarUrl()))
@@ -28,7 +28,7 @@ namespace TimeBot
                 .Build();
 
         // Display a User's local time
-        private string GetTime(UserAccount account, SocketGuildUser user)
+        private static string GetTime(UserAccount account, SocketGuildUser user)
         {
             if (account.localTime == 999)
                 return $"No time set for {user.Nickname ?? user.Username}.\nType `!timesetup` to set up your time and/or country.";
@@ -37,13 +37,13 @@ namespace TimeBot
         }
 
         // Display a User's country
-        private string GetCountry(UserAccount account, SocketGuildUser user) => account.country == "Not set." ? "" : account.country;
+        private static string GetCountry(UserAccount account, SocketGuildUser user) => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a user
-        public async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
+        public static async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
 
         // Display the time for users in a certain role
-        public async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
+        public static async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
         {
             var Users = Context.Guild.Users;
             StringBuilder text = new StringBuilder();
@@ -62,7 +62,7 @@ namespace TimeBot
         }
 
         // Display the !timesetup information
-        public async Task DisplayTimeSetup(ISocketMessageChannel channel)
+        public static async Task DisplayTimeSetup(ISocketMessageChannel channel)
         {
             StringBuilder description = new StringBuilder()
                 .AppendLine("To set up your time, please calculate the difference in hours it is from you and my time:").AppendLine()
@@ -78,7 +78,7 @@ namespace TimeBot
         }
 
         // Set the time for yourself
-        public async Task SetTime(ISocketMessageChannel channel, SocketUser user, double hourDifference)
+        public static async Task SetTime(ISocketMessageChannel channel, SocketUser user, double hourDifference)
         {
             if (hourDifference < -24 || hourDifference > 24)
             {
@@ -101,7 +101,7 @@ namespace TimeBot
         }
 
         // Set the country for yourself
-        public async Task SetCountry(ISocketMessageChannel channel, SocketUser user, string country)
+        public static async Task SetCountry(ISocketMessageChannel channel, SocketUser user, string country)
         {
             if (string.IsNullOrEmpty(country))
             {
@@ -117,20 +117,20 @@ namespace TimeBot
 
             // Find the country input and set it to the capitlized version
             int index = Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
-            country = Countries.ElementAt(index);
 
+            // Save the user's country
             UserAccount account = UserAccounts.GetAccount(user);
-            account.country = country;
+            account.country = Countries.ElementAt(index);
             UserAccounts.SaveAccounts();
 
-            await Utilities.PrintSuccess(channel, $"You have successfully set your country to {country}.\n\nIf this is an error, you can run `!country set [country name]` again.");
+            await Utilities.PrintSuccess(channel, $"You have successfully set your country to {account.country}.\n\nIf this is an error, you can run `!country set [country name]` again.");
         }
 
         // Set up the countries list to the list of valid countries in countries.txt
-        public void SetupCountryList() => Countries = File.ReadAllLines("countries.txt").ToList();
+        public static void SetupCountryList() => Countries = File.ReadAllLines("countries.txt").ToList();
 
         // Help page
-        public async Task DisplayHelp(ISocketMessageChannel channel) => await channel.SendMessageAsync("", false, new EmbedBuilder()
+        public static async Task DisplayHelp(ISocketMessageChannel channel) => await channel.SendMessageAsync("", false, new EmbedBuilder()
                 .WithTitle("Time Bot Help")
                 .WithColor(Utilities.Blue)
                 .WithDescription($"Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
@@ -140,14 +140,14 @@ namespace TimeBot
                 .Build());
 
         // Get Invite Link
-        public async Task DMInviteLink(ISocketMessageChannel channel, SocketUser user)
+        public static async Task DMInviteLink(ISocketMessageChannel channel, SocketUser user)
         {
             await user.SendMessageAsync("https://discordapp.com/api/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot");
             await Utilities.PrintSuccess(channel, "The invite linked has been DMed to you!");
         }
 
         // Display Time for everyone (requested feature)
-        public async Task DisplayEveryonesTime(SocketCommandContext Context)
+        public static async Task DisplayEveryonesTime(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
             StringBuilder text = new StringBuilder();
@@ -167,7 +167,7 @@ namespace TimeBot
         }
 
         // Display Country for everyone (requested feature)
-        public async Task DisplayEveryonesCountry(SocketCommandContext Context)
+        public static async Task DisplayEveryonesCountry(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
             StringBuilder text = new StringBuilder();
@@ -180,12 +180,12 @@ namespace TimeBot
         }
 
         // Send an embed that might have over 2048 characters, so send it as multiple messages if it is
-        public async Task SendPossiblyLongEmbed(ISocketMessageChannel Channel, string Title, string Text)
+        public static async Task SendPossiblyLongEmbed(ISocketMessageChannel Channel, string Title, string Text)
         {
-            if (Text.ToString().Length > 2048)
+            if (Text.Length > 2048)
             {
                 int size = 2048;
-                string str = Text.ToString();
+                string str = Text;
                 List<string> strings = new List<string>();
 
                 for (int i = 0; i < str.Length; i += size)
@@ -199,11 +199,11 @@ namespace TimeBot
                     await Utilities.PrintEmbed(Channel, Title, s, Utilities.Blue);
             }
             else
-                await Utilities.PrintEmbed(Channel, Title, Text.ToString(), Utilities.Blue);
+                await Utilities.PrintEmbed(Channel, Title, Text, Utilities.Blue);
         }
 
         // Display various stats for the server
-        public async Task DisplayUserStats(SocketCommandContext Context)
+        public static async Task DisplayUserStats(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
             StringBuilder Text = new StringBuilder();
@@ -230,34 +230,6 @@ namespace TimeBot
                 .AppendLine($"Users with country set up: {UsersWithCountrySet} ({Math.Round((double)UsersWithCountrySet / TotalUsers * 100, 0)}%)");
 
             await Utilities.PrintEmbed(Context.Channel, "Time Stats", Text.ToString(), Utilities.Blue);
-        }
-
-        // Try to set up server time
-        public async Task TryToSetUpServerTime(SocketCommandContext context)
-        {
-            if (context.Guild.Owner.Id == context.User.Id)
-            {
-                await SetUpServerTime(context).ConfigureAwait(false);
-                return;
-            }
-
-            var roles = ((SocketGuildUser)context.User).Roles;
-            foreach(var role in roles)
-            {
-                if (role.Permissions.Has(GuildPermission.ManageGuild))
-                {
-                    await SetUpServerTime(context).ConfigureAwait(false);
-                    return;
-                }
-            }
-
-            await Utilities.PrintError(context.Channel, "You must have the `Manage Server` permission to do that command.").ConfigureAwait(false);
-        }
-
-        // Set up server time
-        public async Task SetUpServerTime(SocketCommandContext context)
-        {
-            await context.Channel.SendMessageAsync("hi");
         }
     }
 }

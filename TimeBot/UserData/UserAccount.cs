@@ -6,10 +6,4 @@
         public double localTime { get; set; }
         public string country { get; set; }
     }
-
-    public class ServerData
-    {
-        public ulong guildID { get; set; }
-        public double serverTime { get; set; }
-    }
 }

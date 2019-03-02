@@ -12,20 +12,30 @@ namespace TimeBot
         public readonly static Color Red = new Color(231, 76, 60);
         public readonly static Color Green = new Color(31, 139, 76);
 
-        // Print an Error
+        /// <summary>
+        /// Print a red error message.
+        /// </summary>
         public static async Task PrintError(ISocketMessageChannel channel, string message) => await PrintEmbed(channel, "Error", message, Red).ConfigureAwait(false);
 
-        // Print a Success message
+        /// <summary>
+        /// Print a green success message.
+        /// </summary>
         public static async Task PrintSuccess(ISocketMessageChannel channel, string message) => await PrintEmbed(channel, "Success", message, Green).ConfigureAwait(false);
 
-        // Print a basic embed, like an error message or success message
+        /// <summary>
+        /// Print a basic embed.
+        /// </summary>
         public static async Task PrintEmbed(ISocketMessageChannel channel, string title, string message, Color color) => await channel.SendMessageAsync("", false, new EmbedBuilder()
                 .WithTitle(title)
                 .WithColor(color)
                 .WithDescription(message)
                 .Build());
 
-        // Get the current time... somewhere
+        /// <summary>
+        /// Format a time into h:mm tt
+        /// </summary>
+        /// <param name="offset">The amount of hours to add to the current time.</param>
+        /// <returns></returns>
         public static string GetTime(double offset) => DateTime.Now.AddHours(offset).ToString("h:mm tt");
     }
 }
