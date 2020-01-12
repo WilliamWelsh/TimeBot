@@ -23,7 +23,7 @@ namespace TimeBot
             _service.Log += Log;
         }
 
-        private Task Log(LogMessage arg)
+        private static Task Log(LogMessage arg)
         {
             Console.WriteLine(arg);
             return Task.CompletedTask;
