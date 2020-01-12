@@ -1,6 +1,9 @@
 # Time Bot
-This bot can provide the local time and country for a user. All they have to do it set it up with a simple command. The data is saved globally, so you can view your time on several servers.  
-[<img src="https://discordapp.com/api/guilds/294699220743618561/widget.png?style=shield">](https://discord.gg/qsc8YMS) <img src="https://img.shields.io/badge/discord-csharp-blue.svg">[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ee72a439b9c4669a9c122999db57127)](https://app.codacy.com/app/WilliamWelsh/TimeBot?utm_source=github.com&utm_medium=referral&utm_content=WilliamWelsh/TimeBot&utm_campaign=Badge_Grade_Dashboard)
+This bot can provide the local time and country for a user. This is useful if your server has users from around the globe. All they have to do it set it up with a simple command. The data is saved globally, so you can view your time on several servers.  
+<img src="https://img.shields.io/badge/discord-csharp-blue.svg"> [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ee72a439b9c4669a9c122999db57127)](https://app.codacy.com/app/WilliamWelsh/TimeBot?utm_source=github.com&utm_medium=referral&utm_content=WilliamWelsh/TimeBot&utm_campaign=Badge_Grade_Dashboard)
+
+## Invite
+To invite this bot to your server, click [here](https://discordapp.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot).
 
 ## Commands
 ### Main Command
@@ -9,14 +12,14 @@ This bot can provide the local time and country for a user. All they have to do 
 
 ### Setup
 `!timesetup` Tutorial on how to set up time and country.  
-`!time set [hour]` Set your local time.  
+`!time set [hour difference]` Set your local time.  
 `!country set [country name]` Set your country.  
 
 ### Help
 `!timehelp` View the help menu.  
 
 ## Countries
-[Countries.txt](https://github.com/WilliamWelsh/TimeBot/blob/master/TimeBot/countries.txt) is a list of all valid countries. If one is missing, please tell me either on my server or on GitHub.
+[Countries.txt](https://github.com/WilliamWelsh/TimeBot/blob/master/TimeBot/countries.txt) is a list of all valid countries. If one is missing, please tell me either on Discord (Reverse#1193) or on GitHub.
 
 ## Images
 ![Example](https://i.imgur.com/VynC3uB.png)  
