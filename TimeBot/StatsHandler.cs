@@ -24,7 +24,7 @@ namespace TimeBot
                 .WithIconUrl(user.GetAvatarUrl()))
                 .WithDescription(GetTime(account, user))
                 .WithColor(Utilities.Blue)
-                .WithFooter(GetCountry(account, user))
+                .WithFooter(GetCountry(account))
                 .Build();
 
         // Display a User's local time
@@ -37,7 +37,7 @@ namespace TimeBot
         }
 
         // Display a User's country
-        private static string GetCountry(UserAccount account, SocketGuildUser user) => account.country == "Not set." ? "" : account.country;
+        private static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a user
         public static async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
