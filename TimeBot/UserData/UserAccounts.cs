@@ -6,7 +6,7 @@ namespace TimeBot.UserData
 {
     public static class UserAccounts
     {
-        private static List<UserAccount> accounts;
+        public static List<UserAccount> accounts;
 
         private static readonly string accountsFile = "Resources/user_data.json";
 

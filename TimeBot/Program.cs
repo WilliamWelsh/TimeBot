@@ -25,8 +25,7 @@ namespace TimeBot
             await _client.StartAsync();
 
             // Set up the event handler
-            var _handler = new EventHandler();
-            await _handler.InitializeAsync(_client);
+            await EventHandler.InitializeAsync(_client);
             await _client.SetGameAsync("!timehelp");
 
             // Set up the list of valid countries

@@ -35,6 +35,15 @@ namespace TimeBot
         [Command("time set")]
         public async Task SetTime(double hourDifference) => await StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);
 
+        [Command("t")]
+        public async Task ttt()
+        {
+            int total = 0;
+            foreach (var Guild in Context.Client.Guilds)
+                total += Guild.MemberCount;
+            await Context.Channel.SendMessageAsync($"Servers: {Context.Client.Guilds.Count}\nMembers: {total}");
+        }
+
         // Set your country
         [Command("country set")]
         public async Task SetCountry([Remainder]string country) => await StatsHandler.SetCountry(Context.Channel, Context.User, country);
