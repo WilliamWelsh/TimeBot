@@ -3,6 +3,7 @@ using Discord;
 using System.IO;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace TimeBot
 {
@@ -12,6 +13,10 @@ namespace TimeBot
 
         public async Task StartAsync()
         {
+            // Position the console
+            IntPtr ptr = GetConsoleWindow();
+            MoveWindow(ptr, 2010, 355, 550, 355, true);
+
             if (string.IsNullOrEmpty(File.ReadAllText("Resources/botToken.txt")))
             {
                 Console.WriteLine("No bot token found, please view the README and verify there is a bot token in bin/Debug/Resources/botToken.txt");
@@ -40,5 +45,11 @@ namespace TimeBot
             Console.WriteLine(msg.Message);
             return Task.CompletedTask;
         }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
     }
 }
