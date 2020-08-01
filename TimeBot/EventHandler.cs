@@ -6,6 +6,7 @@ using System.Reflection;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using DiscordBotsList.Api;
+using Newtonsoft.Json;
 
 namespace TimeBot
 {
@@ -30,9 +31,17 @@ namespace TimeBot
         private static async Task OnReady()
         {
             // Update server count on Top.GG
-            var DblAPI = new AuthDiscordBotListApi(529569000028373002, File.ReadAllText("Resources/dblToken.txt"));
-            var me = await DblAPI.GetMeAsync();
-            await me.UpdateStatsAsync(_client.Guilds.Count);
+            //var DblAPI = new AuthDiscordBotListApi(529569000028373002, File.ReadAllText("Resources/dblToken.txt"));
+            //var me = await DblAPI.GetMeAsync();
+            //await me.UpdateStatsAsync(_client.Guilds.Count);
+
+            // Initialize all clocks
+            foreach (var file in Directory.GetFiles("Resources/clocks"))
+            {
+                dynamic data = JsonConvert.DeserializeObject(File.ReadAllText(file));
+                var clock = new UpdatingClock();
+                await clock.Initialize(_client, (ulong)data.serverID, (ulong)data.channelID, (ulong)data.userID);
+            }
         }
 
         private static Task Log(LogMessage arg)
@@ -53,7 +62,6 @@ namespace TimeBot
 
             //if (msg.Channel.Id == 624765261542719509)
             //    Console.WriteLine(msg.Content);
-
         }
     }
 }

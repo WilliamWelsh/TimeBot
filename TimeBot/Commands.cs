@@ -1,6 +1,11 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
+using Newtonsoft.Json;
+using System.Dynamic;
+using System.IO;
 using System.Threading.Tasks;
+using TimeBot.UserData;
 
 namespace TimeBot
 {
@@ -55,5 +60,40 @@ namespace TimeBot
         // TODO: Finish this
         [Command("timestats")]
         public async Task TimeStats() => await StatsHandler.DisplayUserStats(Context);
+
+        // Set a channel clock
+        // This will update the channel name with the name and time of a certain user every minute
+        [Command("setclock")]
+        public async Task SetClock(SocketGuildUser targetUser = null)
+        {
+            bool isAdmin = false;
+
+            var user = Context.User as SocketGuildUser;
+            foreach (var role in user.Roles)
+                if (role.Permissions.Administrator)
+                    isAdmin = true;
+
+            if (targetUser == null)
+                targetUser = user;
+
+            if (!isAdmin)
+            {
+                await Context.Channel.PrintError("You must be an Administrator to run this command.");
+                return;
+            }
+
+            await Context.Channel.PrintEmbed("Clock Set", $"You have created a new clock. You might want to delete this message. Make sure I have the permission to modify channels. This channel will be updated every minute. If you need help, join the support server: https://discord.gg/ga9V5pa)", Utilities.Blue);
+
+            dynamic data = new ExpandoObject();
+            data.serverID = Context.Guild.Id;
+            data.channelID = Context.Channel.Id;
+            data.userID = targetUser.Id;
+
+            File.WriteAllText($"Resources/clocks/{targetUser.Id}.txt", JsonConvert.SerializeObject(data));
+
+            // Start the clock! :)
+            var clock = new UpdatingClock();
+            await clock.Initialize(Context.Client, (ulong)data.serverID, (ulong)data.channelID, (ulong)data.userID);
+        }
     }
 }

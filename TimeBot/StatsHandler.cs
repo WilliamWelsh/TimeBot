@@ -28,7 +28,7 @@ namespace TimeBot
                 .Build();
 
         // Display a User's local time
-        private static string GetTime(UserAccount account, SocketGuildUser user)
+        public static string GetTime(UserAccount account, SocketGuildUser user)
         {
             if (account.localTime == 999)
                 return $"No time set for {user.Nickname ?? user.Username}.\nType `!timesetup` to set up your time and/or country.";
@@ -37,7 +37,7 @@ namespace TimeBot
         }
 
         // Display a User's country
-        private static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
+        public static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a user
         public static async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
@@ -58,7 +58,7 @@ namespace TimeBot
                         text.AppendLine($"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
                 }
             }
-            await Utilities.PrintEmbed(Context.Channel, $"Time for {Role}", text.ToString(), Role.Color);
+            await Context.Channel.PrintEmbed($"Time for {Role}", text.ToString(), Role.Color);
         }
 
         // Display the !timesetup information
@@ -82,14 +82,14 @@ namespace TimeBot
         {
             if (hourDifference < -24 || hourDifference > 24)
             {
-                await Utilities.PrintError(channel, "Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.");
+                await channel.PrintError("Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.");
                 return;
             }
 
             int minuteDifference = (int)((decimal)hourDifference % 1 * 100);
             if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
             {
-                await Utilities.PrintError(channel, "Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
+                await channel.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace TimeBot
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
-            await Utilities.PrintSuccess(channel, $"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)user)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+            await channel.PrintSuccess($"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)user)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
         }
 
         // Set the country for yourself
@@ -105,13 +105,13 @@ namespace TimeBot
         {
             if (string.IsNullOrEmpty(country))
             {
-                await Utilities.PrintError(channel, "The country name cannot be empty.\n\nSuccessful Example: `!country set United States`");
+                await channel.PrintError("The country name cannot be empty.\n\nSuccessful Example: `!country set United States`");
                 return;
             }
 
             if (!Countries.Contains(country, StringComparer.CurrentCultureIgnoreCase))
             {
-                await Utilities.PrintError(channel, "Country not valid. Please try again.\n\nExamples:\n`!country set united states`\n`!country set united kingdom`\n`!country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt");
+                await channel.PrintError("Country not valid. Please try again.\n\nExamples:\n`!country set united states`\n`!country set united kingdom`\n`!country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt");
                 return;
             }
 
@@ -123,7 +123,7 @@ namespace TimeBot
             account.country = Countries.ElementAt(index);
             UserAccounts.SaveAccounts();
 
-            await Utilities.PrintSuccess(channel, $"You have successfully set your country to {account.country}.\n\nIf this is an error, you can run `!country set [country name]` again.");
+            await channel.PrintSuccess($"You have successfully set your country to {account.country}.\n\nIf this is an error, you can run `!country set [country name]` again.");
         }
 
         // Set up the countries list to the list of valid countries in countries.txt
@@ -135,7 +135,7 @@ namespace TimeBot
                 .WithColor(Utilities.Blue)
                 .WithDescription($"Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
                 .AddField("Commands", "`!timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`!time @mentionedUser` View a user's local time.\n`!time set [number]` Set your local time.\n`!country set [country name]`Set your country.\n`!timeinvite` Get an invite link for the bot.")
-                .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/NJUScEN) for additional help.\n\nOr add the Developer: Reverse#1193")
+                .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/ga9V5pa) for additional help.\n\nOr add the Developer: Reverse#1193")
                 .AddField("GitHub", "https://github.com/WilliamWelsh/TimeBot")
                 .Build());
 
@@ -143,7 +143,7 @@ namespace TimeBot
         public static async Task DMInviteLink(ISocketMessageChannel channel, SocketUser user)
         {
             await user.SendMessageAsync("https://discordapp.com/api/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot");
-            await Utilities.PrintSuccess(channel, "The invite linked has been DMed to you!");
+            await channel.PrintSuccess("The invite linked has been DMed to you!");
         }
 
         // Display Time for everyone (requested feature)
@@ -196,10 +196,10 @@ namespace TimeBot
                 }
 
                 foreach (string s in strings)
-                    await Utilities.PrintEmbed(Channel, Title, s, Utilities.Blue);
+                    await Channel.PrintEmbed(Title, s, Utilities.Blue);
             }
             else
-                await Utilities.PrintEmbed(Channel, Title, Text, Utilities.Blue);
+                await Channel.PrintEmbed(Title, Text, Utilities.Blue);
         }
 
         // Display various stats for the server
@@ -229,7 +229,7 @@ namespace TimeBot
                 .AppendLine($"Users with time set up: {UsersWithTimeSet} ({Math.Round((double)UsersWithTimeSet / TotalUsers * 100, 0)}%)").AppendLine()
                 .AppendLine($"Users with country set up: {UsersWithCountrySet} ({Math.Round((double)UsersWithCountrySet / TotalUsers * 100, 0)}%)");
 
-            await Utilities.PrintEmbed(Context.Channel, "Time Stats", Text.ToString(), Utilities.Blue);
+            await Context.Channel.PrintEmbed("Time Stats", Text.ToString(), Utilities.Blue);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace TimeBot
 {
-    static class Config
+    internal static class Config
     {
         static Config()
         {

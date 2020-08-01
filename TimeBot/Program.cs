@@ -7,9 +7,11 @@ using System.Runtime.InteropServices;
 
 namespace TimeBot
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
+        private static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
+
+        private bool IS_TESTING = true;
 
         public async Task StartAsync()
         {
@@ -26,7 +28,7 @@ namespace TimeBot
 
             var _client = new DiscordSocketClient(new DiscordSocketConfig { LogLevel = LogSeverity.Verbose });
             _client.Log += Log;
-            await _client.LoginAsync(TokenType.Bot, File.ReadAllText("Resources/botToken.txt"));
+            await _client.LoginAsync(TokenType.Bot, IS_TESTING ? File.ReadAllText(@"C:\Users\willi\Documents\repos\testBotToken.txt") : File.ReadAllText("Resources/botToken.txt"));
             await _client.StartAsync();
 
             // Set up the event handler
@@ -47,7 +49,7 @@ namespace TimeBot
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr GetConsoleWindow();
+        private static extern IntPtr GetConsoleWindow();
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
