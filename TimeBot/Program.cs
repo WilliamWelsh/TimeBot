@@ -11,7 +11,7 @@ namespace TimeBot
     {
         private static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
 
-        private bool IS_TESTING = true;
+        private bool IS_TESTING = false;
 
         public async Task StartAsync()
         {
