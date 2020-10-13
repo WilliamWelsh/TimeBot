@@ -23,7 +23,7 @@ namespace TimeBot
                 .WithName(user.Nickname ?? user.Username)
                 .WithIconUrl(user.GetAvatarUrl()))
                 .WithDescription(GetTime(account, user))
-                .WithColor(Utilities.Blue)
+                .WithColor(Utilities.GetUserColor(user.GetAvatarUrl()))
                 .WithFooter(GetCountry(account))
                 .Build();
 

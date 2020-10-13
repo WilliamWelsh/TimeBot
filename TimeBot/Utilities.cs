@@ -1,17 +1,27 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Net;
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using ColorThiefDotNet;
+using Color = Discord.Color;
 
 namespace TimeBot
 {
     public static class Utilities
     {
-        // Colors
-        public readonly static Color Blue = new Color(127, 166, 208);
+        // Common Colors used
 
-        public readonly static Color Red = new Color(231, 76, 60);
-        public readonly static Color Green = new Color(31, 139, 76);
+        public static readonly Color Blue = new Color(127, 166, 208);
+        public static readonly Color Red = new Color(231, 76, 60);
+        public static readonly Color Green = new Color(31, 139, 76);
+
+        /// <summary>
+        /// ColorThief (used to extract dominant color from images)
+        /// </summary>
+        public static readonly ColorThief ColorThief = new ColorThief();
 
         /// <summary>
         /// Print a red error message.
@@ -31,6 +41,19 @@ namespace TimeBot
                 .WithColor(color)
                 .WithDescription(message)
                 .Build());
+
+        public static Color GetUserColor(string avatarURL)
+        {
+            // Download the avatar
+            using (var client = new WebClient())
+            using (var ms = new MemoryStream(client.DownloadData(avatarURL)))
+            using (var avatar = new Bitmap(System.Drawing.Image.FromStream(ms)))
+            {
+                // Get the color and convert it to a Discord color
+                var color = ColorThief.GetColor(avatar).Color;
+                return new Color(color.R, color.G, color.B);
+            }
+        }
 
         /// <summary>
         /// Format a time into h:mm tt

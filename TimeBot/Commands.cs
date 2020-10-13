@@ -1,11 +1,6 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using System.Dynamic;
-using System.IO;
 using System.Threading.Tasks;
-using TimeBot.UserData;
 
 namespace TimeBot
 {
@@ -51,7 +46,7 @@ namespace TimeBot
 
         // Set your country
         [Command("country set")]
-        public async Task SetCountry([Remainder]string country) => await StatsHandler.SetCountry(Context.Channel, Context.User, country);
+        public async Task SetCountry([Remainder] string country) => await StatsHandler.SetCountry(Context.Channel, Context.User, country);
 
         // Help menu
         [Command("timehelp")]
