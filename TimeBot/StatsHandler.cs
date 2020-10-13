@@ -46,7 +46,7 @@ namespace TimeBot
         public static async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
         {
             var Users = Context.Guild.Users;
-            StringBuilder text = new StringBuilder();
+            var text = new StringBuilder();
             foreach (var User in Users)
             {
                 if (User.Roles.Contains(Role))
@@ -64,7 +64,7 @@ namespace TimeBot
         // Display the !timesetup information
         public static async Task DisplayTimeSetup(ISocketMessageChannel channel)
         {
-            StringBuilder description = new StringBuilder()
+            var description = new StringBuilder()
                 .AppendLine("To set up your time, please calculate the difference in hours it is from you and my time:").AppendLine()
                 .AppendLine($"My time: {DateTime.Now.ToString("h:mm tt")}").AppendLine()
                 .AppendLine("Example, if it's 12 pm for me, and 10 am for you, then type `!time set -2` because the difference is 2 hours.").AppendLine()
@@ -86,14 +86,14 @@ namespace TimeBot
                 return;
             }
 
-            int minuteDifference = (int)((decimal)hourDifference % 1 * 100);
+            var minuteDifference = (int)((decimal)hourDifference % 1 * 100);
             if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
             {
                 await channel.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
                 return;
             }
 
-            UserAccount account = UserAccounts.GetAccount(user);
+            var account = UserAccounts.GetAccount(user);
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
@@ -116,10 +116,10 @@ namespace TimeBot
             }
 
             // Find the country input and set it to the capitlized version
-            int index = Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
+            var index = Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
 
             // Save the user's country
-            UserAccount account = UserAccounts.GetAccount(user);
+            var account = UserAccounts.GetAccount(user);
             account.country = Countries.ElementAt(index);
             UserAccounts.SaveAccounts();
 
@@ -150,7 +150,7 @@ namespace TimeBot
         public static async Task DisplayEveryonesTime(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
-            StringBuilder text = new StringBuilder();
+            var text = new StringBuilder();
             foreach (var User in Users)
             {
                 if (!User.IsBot)
@@ -170,7 +170,7 @@ namespace TimeBot
         public static async Task DisplayEveryonesCountry(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
-            StringBuilder text = new StringBuilder();
+            var text = new StringBuilder();
 
             foreach (var User in Users)
                 if (!User.IsBot)
@@ -184,9 +184,9 @@ namespace TimeBot
         {
             if (Text.Length > 2048)
             {
-                int size = 2048;
-                string str = Text;
-                List<string> strings = new List<string>();
+                var size = 2048;
+                var str = Text;
+                var strings = new List<string>();
 
                 for (int i = 0; i < str.Length; i += size)
                 {
@@ -195,7 +195,7 @@ namespace TimeBot
                     strings.Add(str.Substring(i, size));
                 }
 
-                foreach (string s in strings)
+                foreach (var s in strings)
                     await Channel.PrintEmbed(Title, s, Utilities.Blue);
             }
             else
@@ -206,11 +206,11 @@ namespace TimeBot
         public static async Task DisplayUserStats(SocketCommandContext Context)
         {
             var Users = Context.Guild.Users;
-            StringBuilder Text = new StringBuilder();
+            var Text = new StringBuilder();
 
-            int TotalUsers = 0;
-            int UsersWithTimeSet = 0;
-            int UsersWithCountrySet = 0;
+            var TotalUsers = 0;
+            var UsersWithTimeSet = 0;
+            var UsersWithCountrySet = 0;
 
             foreach (var User in Users)
             {

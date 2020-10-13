@@ -11,11 +11,9 @@ namespace TimeBot
     {
         private static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
 
-        private bool IS_TESTING = false;
-
         public async Task StartAsync()
         {
-            // Position the console
+            // Position the console (for my server)
             IntPtr ptr = GetConsoleWindow();
             MoveWindow(ptr, 2010, 355, 550, 355, true);
 
@@ -28,7 +26,7 @@ namespace TimeBot
 
             var _client = new DiscordSocketClient(new DiscordSocketConfig { LogLevel = LogSeverity.Verbose });
             _client.Log += Log;
-            await _client.LoginAsync(TokenType.Bot, IS_TESTING ? File.ReadAllText(@"C:\Users\willi\Documents\repos\testBotToken.txt") : File.ReadAllText("Resources/botToken.txt"));
+            await _client.LoginAsync(TokenType.Bot, Config.IS_TESTING ? File.ReadAllText(@"C:\Users\willi\Documents\repos\testBotToken.txt") : File.ReadAllText("Resources/botToken.txt"));
             await _client.StartAsync();
 
             // Set up the event handler

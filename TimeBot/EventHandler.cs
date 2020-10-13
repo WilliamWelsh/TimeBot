@@ -4,9 +4,8 @@ using System.IO;
 using Discord.Commands;
 using System.Reflection;
 using Discord.WebSocket;
-using System.Threading.Tasks;
 using DiscordBotsList.Api;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace TimeBot
 {
@@ -31,6 +30,8 @@ namespace TimeBot
         private static async Task OnReady()
         {
             // Update server count on Top.GG
+            if (Config.IS_TESTING) return;
+
             var DblAPI = new AuthDiscordBotListApi(529569000028373002, File.ReadAllText("Resources/dblToken.txt"));
             var me = await DblAPI.GetMeAsync();
             await me.UpdateStatsAsync(_client.Guilds.Count);
@@ -50,10 +51,7 @@ namespace TimeBot
 
             int argPos = 0;
             if (msg.HasStringPrefix("!", ref argPos))
-                await _service.ExecuteAsync(context, argPos, null, MultiMatchHandling.Exception);
-
-            //if (msg.Channel.Id == 624765261542719509)
-            //    Console.WriteLine(msg.Content);
+                await _service.ExecuteAsync(context, argPos, null);
         }
     }
 }
