@@ -33,7 +33,11 @@ namespace TimeBot
 
         // Set your time
         [Command("time set")]
-        public async Task SetTime(double hourDifference) => await StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);
+        public async Task SetTime(double hourDifference) => await StatsHandler.SetTime(Context, hourDifference);
+
+        // Set someone else's time
+        [Command("time set")]
+        public async Task SetSomeoneElsesTime(SocketUser user, double hourDifference) => await StatsHandler.SetSomeonesTime(Context, user, hourDifference);
 
         [Command("tstats")]
         public async Task ttt()

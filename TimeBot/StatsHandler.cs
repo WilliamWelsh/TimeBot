@@ -15,7 +15,7 @@ namespace TimeBot
     {
         private static List<string> Countries;
 
-        // The main embed that displays time for a user
+        // The main embed that displays time for a target
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
         private static Embed StatsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
@@ -39,7 +39,7 @@ namespace TimeBot
         // Display a User's country
         public static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
 
-        // Display the time (and possibly country) for a user
+        // Display the time (and possibly country) for a target
         public static async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
 
         // Display the time for users in a certain role
@@ -78,26 +78,63 @@ namespace TimeBot
         }
 
         // Set the time for yourself
-        public static async Task SetTime(ISocketMessageChannel channel, SocketUser user, double hourDifference)
+        public static async Task SetTime(SocketCommandContext context, double hourDifference)
         {
             if (hourDifference < -24 || hourDifference > 24)
             {
-                await channel.PrintError("Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.");
+                await context.Channel.PrintError("Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.");
                 return;
             }
 
             var minuteDifference = (int)((decimal)hourDifference % 1 * 100);
             if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
             {
-                await channel.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
+                await context.Channel.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
                 return;
             }
 
-            var account = UserAccounts.GetAccount(user);
+            var account = UserAccounts.GetAccount(context.User);
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
-            await channel.PrintSuccess($"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)user)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+            await context.Channel.PrintSuccess($"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)context.User)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+        }
+
+        // Set the time for yourself
+        public static async Task SetSomeonesTime(SocketCommandContext context, SocketUser target, double hourDifference)
+        {
+            // If the target is talking about their self.. just set your own time..?
+            if (context.User.Id == target.Id)
+            {
+                await SetTime(context, hourDifference);
+                return;
+            }
+
+            // Make sure the commanding target is an admin
+            if (!((SocketGuildUser)context.User).GuildPermissions.Administrator)
+            {
+                await context.Channel.PrintError("Sorry, only administrators can set other people's time.");
+                return;
+            }
+
+            if (hourDifference < -24 || hourDifference > 24)
+            {
+                await context.Channel.PrintError("Invalid hour difference. The input must be between -24 and 24. Please run `!timesetup` for more help.");
+                return;
+            }
+
+            var minuteDifference = (int)((decimal)hourDifference % 1 * 100);
+            if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
+            {
+                await context.Channel.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `!timesetup` for more help.");
+                return;
+            }
+
+            var account = UserAccounts.GetAccount(target);
+            account.localTime = hourDifference;
+            UserAccounts.SaveAccounts();
+
+            await context.Channel.PrintSuccess($"{context.User.Mention} has succesfully set {target.Mention}'s time.\n\n{GetTime(account, (SocketGuildUser)target)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
         }
 
         // Set the country for yourself
@@ -118,7 +155,7 @@ namespace TimeBot
             // Find the country input and set it to the capitlized version
             var index = Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
 
-            // Save the user's country
+            // Save the target's country
             var account = UserAccounts.GetAccount(user);
             account.country = Countries.ElementAt(index);
             UserAccounts.SaveAccounts();
@@ -134,7 +171,7 @@ namespace TimeBot
                 .WithTitle("Time Bot Help")
                 .WithColor(Utilities.Blue)
                 .WithDescription($"Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
-                .AddField("Commands", "`!timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`!time @mentionedUser` View a user's local time.\n`!time set [number]` Set your local time.\n`!country set [country name]`Set your country.\n`!timeinvite` Get an invite link for the bot.")
+                .AddField("Commands", "`!timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`!time @mentionedUser` View a target's local time.\n`!time set [number]` Set your local time.\n`!country set [country name]`Set your country.\n`!timeinvite` Get an invite link for the bot.")
                 .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/ga9V5pa) for additional help.\n\nOr add the Developer: Reverse#1193")
                 .AddField("GitHub", "https://github.com/WilliamWelsh/TimeBot")
                 .Build());
