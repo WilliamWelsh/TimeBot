@@ -35,7 +35,7 @@ namespace TimeBot
         [Command("time set")]
         public async Task SetTime(double hourDifference) => await StatsHandler.SetTime(Context.Channel, Context.User, hourDifference);
 
-        [Command("t")]
+        [Command("tstats")]
         public async Task ttt()
         {
             int total = 0;
