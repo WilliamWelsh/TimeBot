@@ -50,7 +50,7 @@ namespace TimeBot
             using (var avatar = new Bitmap(System.Drawing.Image.FromStream(ms)))
             {
                 // Get the color and convert it to a Discord color
-                var color = ColorThief.GetColor(avatar).Color;
+                var color = ColorThief.GetColor(avatar, 10, false).Color; // TODO check for white
                 return new Color(color.R, color.G, color.B);
             }
         }
