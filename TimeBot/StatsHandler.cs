@@ -22,7 +22,8 @@ namespace TimeBot
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(user.Nickname ?? user.Username)
                 .WithIconUrl(user.GetAvatarUrl()))
-                .WithDescription(GetTime(account, user))
+                //.WithDescription(GetTime(account, user))
+                .WithDescription($"{GetTime(account, user)}\n\nTime may not be working for some users, this is a known issue due to Discord's new security measures for bots that are in a lot of servers. This will be fixed asap.")
                 .WithColor(Utilities.GetUserColor(user.GetAvatarUrl()))
                 .WithFooter(GetCountry(account))
                 .Build();
@@ -58,7 +59,8 @@ namespace TimeBot
                         text.AppendLine($"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
                 }
             }
-            await Context.Channel.PrintEmbed($"Time for {Role}", text.ToString(), Role.Color);
+            //await Context.Channel.PrintEmbed($"Time for {Role}", text.ToString(), Role.Color);
+            await Context.Channel.PrintEmbed($"Time for {Role}", $"{text}\n\nTime may not be working for some users, this is a known issue due to Discord's new security measures for bots that are in a lot of servers. This will be fixed asap.", Role.Color);
         }
 
         // Display the !timesetup information
