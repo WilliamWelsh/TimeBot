@@ -23,7 +23,6 @@ namespace TimeBot.UserData
 
         public static void SaveAccounts() => DateStorage.SaveUserAccounts(accounts, accountsFile);
 
-        public static UserAccount GetAccount(SocketUser user) => GetOrCreateUserAccount(user.Id);
         public static UserAccount GetAccount(ulong Id) => GetOrCreateUserAccount(Id);
 
         private static UserAccount GetOrCreateUserAccount(ulong id)

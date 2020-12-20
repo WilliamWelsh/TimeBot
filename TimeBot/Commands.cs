@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿using System;
+using System.Globalization;
+using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 
@@ -17,9 +19,42 @@ namespace TimeBot
 
         // Display time (and possible country) for a user
         [Command("time")]
-        public async Task DisplayStatsForUser(SocketGuildUser user = null) => await StatsHandler.DisplayStats(Context.Channel, user ?? (SocketGuildUser)Context.User);
+        public async Task DisplayStatsForUser([Remainder] string input = null)
+        {
+            Console.WriteLine(input);
+            var name = "";
+            var avatarURL = "";
+            ulong id;
 
-        // Display time (and possible country) for a user
+            // No input = the user
+            if (input == null)
+            {
+                name = ((SocketGuildUser)Context.User).Nickname ?? Context.User.Username;
+                avatarURL = Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl();
+                id = Context.User.Id;
+            }
+
+            // By mention
+            else if (input.StartsWith("<@!"))
+            {
+                id = Convert.ToUInt64(input.Replace("<@!", "").Replace(">", ""));
+
+                var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, id);
+                name = restUser.Nickname ?? restUser.Username;
+                avatarURL = restUser.GetAvatarUrl() ?? restUser.GetDefaultAvatarUrl();
+            }
+
+            // By ID
+            else if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
+            {
+                var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, id);
+                name = restUser.Nickname ?? restUser.Username;
+                avatarURL = restUser.GetAvatarUrl() ?? restUser.GetDefaultAvatarUrl();
+            }
+
+            await StatsHandler.DisplayStats(Context.Channel, name, avatarURL, id);
+        }
+
         [Command("time")]
         public async Task DisplayStatsForRole(SocketRole role = null) => await StatsHandler.DisplayStats(Context, role);
 

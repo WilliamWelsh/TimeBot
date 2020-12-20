@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Discord;
 using System.IO;
 using System.Text;
@@ -8,6 +9,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Discord.Rest;
 
 namespace TimeBot
 {
@@ -18,49 +20,54 @@ namespace TimeBot
         // The main embed that displays time for a target
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private static Embed StatsEmbed(UserAccount account, SocketGuildUser user) => new EmbedBuilder()
+        private static Embed StatsEmbed(UserAccount account, string name, string avatarURL, ulong id) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
-                .WithName(user.Nickname ?? user.Username)
-                .WithIconUrl(user.GetAvatarUrl()))
+                .WithName(name)
+                .WithIconUrl(avatarURL))
                 //.WithDescription(GetTime(account, user))
-                .WithDescription($"{GetTime(account, user)}\n\nTime may not be working for some users, this is a known issue due to Discord's new security measures for bots that are in a lot of servers. This will be fixed asap.")
-                .WithColor(Utilities.GetUserColor(user.GetAvatarUrl()))
+                .WithDescription($"{GetTime(account, name)}")
+                .WithColor(Utilities.GetUserColor(avatarURL))
                 .WithFooter(GetCountry(account))
                 .Build();
 
         // Display a User's local time
-        public static string GetTime(UserAccount account, SocketGuildUser user)
+        public static string GetTime(UserAccount account, string name)
         {
             if (account.localTime == 999)
-                return $"No time set for {user.Nickname ?? user.Username}.\nType `!timesetup` to set up your time and/or country.";
+                return $"No time set for {name}.\nType `!timesetup` to set up your time and/or country.";
             var localTime = DateTime.Now.AddHours(account.localTime);
-            return $"It's {localTime:h:mm tt} for {user.Nickname ?? user.Username}.\n{localTime:dddd, MMMM d.}";
+            return $"It's {localTime:h:mm tt} for {name}.\n{localTime:dddd, MMMM d.}";
         }
 
         // Display a User's country
         public static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a target
-        public static async Task DisplayStats(ISocketMessageChannel channel, SocketGuildUser user) => await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(user), user));
+        public static async Task DisplayStats(ISocketMessageChannel channel, string name, string avatarURL, ulong id)
+        {
+            await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL, id));
+        }
 
         // Display the time for users in a certain role
         public static async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
         {
-            var Users = Context.Guild.Users;
+            var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
             var text = new StringBuilder();
-            foreach (var User in Users)
+            await foreach (var List in Users)
             {
-                if (User.Roles.Contains(Role))
+                foreach (var User in List)
                 {
-                    var account = UserAccounts.GetAccount(User);
-                    if (account.localTime == 999)
-                        text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
-                    else
-                        text.AppendLine($"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
+                    if (User.RoleIds.Contains(Role.Id))
+                    {
+                        var account = UserAccounts.GetAccount(User.Id);
+                        text.AppendLine(account.localTime == 999
+                            ? $"{User.Nickname ?? User.Username} - No Time Set"
+                            : $"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
+                    }
                 }
             }
-            //await Context.Channel.PrintEmbed($"Time for {Role}", text.ToString(), Role.Color);
-            await Context.Channel.PrintEmbed($"Time for {Role}", $"{text}\n\nTime may not be working for some users, this is a known issue due to Discord's new security measures for bots that are in a lot of servers. This will be fixed asap.", Role.Color);
+
+            await Context.Channel.PrintEmbed($"Time for {Role}", $"{text}", Role.Color);
         }
 
         // Display the !timesetup information
@@ -95,11 +102,11 @@ namespace TimeBot
                 return;
             }
 
-            var account = UserAccounts.GetAccount(context.User);
+            var account = UserAccounts.GetAccount(context.User.Id);
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
-            await context.Channel.PrintSuccess($"You have succesfully set your time.\n\n{GetTime(account, (SocketGuildUser)context.User)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+            await context.Channel.PrintSuccess($"You have succesfully set your time.\n\n{GetTime(account, context.User.Username)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
         }
 
         // Set the time for yourself
@@ -132,11 +139,11 @@ namespace TimeBot
                 return;
             }
 
-            var account = UserAccounts.GetAccount(target);
+            var account = UserAccounts.GetAccount(target.Id);
             account.localTime = hourDifference;
             UserAccounts.SaveAccounts();
 
-            await context.Channel.PrintSuccess($"{context.User.Mention} has succesfully set {target.Mention}'s time.\n\n{GetTime(account, (SocketGuildUser)target)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
+            await context.Channel.PrintSuccess($"{context.User.Mention} has succesfully set {target.Mention}'s time.\n\n{GetTime(account, target.Username)}\n\nIf the time is wrong, try again. Type `!timesetup` for more help.");
         }
 
         // Set the country for yourself
@@ -158,7 +165,7 @@ namespace TimeBot
             var index = Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
 
             // Save the target's country
-            var account = UserAccounts.GetAccount(user);
+            var account = UserAccounts.GetAccount(user.Id);
             account.country = Countries.ElementAt(index);
             UserAccounts.SaveAccounts();
 
@@ -188,32 +195,38 @@ namespace TimeBot
         // Display Time for everyone (requested feature)
         public static async Task DisplayEveryonesTime(SocketCommandContext Context)
         {
-            var Users = Context.Guild.Users;
+            var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
             var text = new StringBuilder();
-            foreach (var User in Users)
+            await foreach (var List in Users)
             {
-                if (!User.IsBot)
+                foreach (var User in List)
                 {
-                    var account = UserAccounts.GetAccount(User);
-                    if (account.localTime == 999)
-                        text.AppendLine($"{User.Nickname ?? User.Username} - No Time Set");
-                    else
-                        text.AppendLine($"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
+                    if (User.IsBot) continue;
+
+                    var account = UserAccounts.GetAccount(User.Id);
+
+                    text.AppendLine(account.localTime == 999
+                        ? $"{User.Nickname ?? User.Username} - No Time Set"
+                        : $"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
                 }
             }
 
-            await SendPossiblyLongEmbed(Context.Channel, "Time for All", text.ToString()).ConfigureAwait(false);
+            await SendPossiblyLongEmbed(Context.Channel, "Time for All", $"{text}").ConfigureAwait(false);
         }
 
         // Display Country for everyone (requested feature)
         public static async Task DisplayEveryonesCountry(SocketCommandContext Context)
         {
-            var Users = Context.Guild.Users;
+            var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
             var text = new StringBuilder();
-
-            foreach (var User in Users)
-                if (!User.IsBot)
-                    text.AppendLine($"{User.Nickname ?? User.Username} - {UserAccounts.GetAccount(User).country}");
+            await foreach (var List in Users)
+            {
+                foreach (var User in List)
+                {
+                    if (!User.IsBot)
+                        text.AppendLine($"{User.Nickname ?? User.Username} - {UserAccounts.GetAccount(User.Id).country}");
+                }
+            }
 
             await SendPossiblyLongEmbed(Context.Channel, "Everyone's Country", text.ToString()).ConfigureAwait(false);
         }
@@ -256,7 +269,7 @@ namespace TimeBot
                 if (!User.IsBot)
                 {
                     TotalUsers++;
-                    var account = UserAccounts.GetAccount(User);
+                    var account = UserAccounts.GetAccount(User.Id);
                     if (account.localTime != 999)
                         UsersWithTimeSet++;
                     if (account.country != "Not set.")

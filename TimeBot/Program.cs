@@ -4,6 +4,7 @@ using System.IO;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using Discord.Rest;
 
 namespace TimeBot
 {
@@ -24,13 +25,21 @@ namespace TimeBot
                 return;
             }
 
-            var _client = new DiscordSocketClient(new DiscordSocketConfig { LogLevel = LogSeverity.Verbose });
+            var _restClient = new DiscordRestClient(new DiscordRestConfig());
+            await _restClient.LoginAsync(TokenType.Bot, File.ReadAllText("Resources/botToken.txt"));
+
+            var _client = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                LogLevel = LogSeverity.Verbose,
+                GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers
+            });
             _client.Log += Log;
-            await _client.LoginAsync(TokenType.Bot, Config.IS_TESTING ? File.ReadAllText(@"C:\Users\willi\Documents\repos\testBotToken.txt") : File.ReadAllText("Resources/botToken.txt"));
+
+            await _client.LoginAsync(TokenType.Bot, File.ReadAllText("Resources/botToken.txt"));
             await _client.StartAsync();
 
             // Set up the event handler
-            await EventHandler.InitializeAsync(_client);
+            await EventHandler.InitializeAsync(_client, _restClient);
             await _client.SetGameAsync("!timehelp");
 
             // Set up the list of valid countries

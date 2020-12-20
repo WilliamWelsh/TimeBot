@@ -6,35 +6,38 @@ using System.Reflection;
 using Discord.WebSocket;
 using DiscordBotsList.Api;
 using System.Threading.Tasks;
+using Discord.Rest;
 
 namespace TimeBot
 {
     public static class EventHandler
     {
-        public static DiscordSocketClient _client;
+        public static DiscordSocketClient _socketClient;
+        public static DiscordRestClient _restClient;
         public static CommandService _service;
 
-        public static async Task InitializeAsync(DiscordSocketClient client)
+        private static bool isReady;
+
+        public static async Task InitializeAsync(DiscordSocketClient socketClient, DiscordRestClient restClient)
         {
-            _client = client;
+            _socketClient = socketClient;
+            _restClient = restClient;
+
             _service = new CommandService();
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), null);
 
-            _client.MessageReceived += HandleCommandAsync;
+            _socketClient.MessageReceived += HandleCommandAsync;
 
             _service.Log += Log;
 
-            _client.Ready += OnReady;
+            _socketClient.Ready += OnReady;
         }
 
         private static async Task OnReady()
         {
-            // Update server count on Top.GG
-            if (Config.IS_TESTING) return;
-
             var DblAPI = new AuthDiscordBotListApi(529569000028373002, File.ReadAllText("Resources/dblToken.txt"));
             var me = await DblAPI.GetMeAsync();
-            await me.UpdateStatsAsync(_client.Guilds.Count);
+            await me.UpdateStatsAsync(_socketClient.Guilds.Count);
         }
 
         private static Task Log(LogMessage arg)
@@ -47,7 +50,7 @@ namespace TimeBot
         {
             if (!(s is SocketUserMessage msg) || msg.Author.IsBot) return;
 
-            var context = new SocketCommandContext(_client, msg);
+            var context = new SocketCommandContext(_socketClient, msg);
 
             int argPos = 0;
             if (msg.HasStringPrefix("!", ref argPos))
