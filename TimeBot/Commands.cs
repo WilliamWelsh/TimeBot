@@ -21,7 +21,6 @@ namespace TimeBot
         [Command("time")]
         public async Task DisplayStatsForUser([Remainder] string input = null)
         {
-            Console.WriteLine(input);
             var name = "";
             var avatarURL = "";
             ulong id;
@@ -35,9 +34,9 @@ namespace TimeBot
             }
 
             // By mention
-            else if (input.StartsWith("<@!"))
+            else if (input.StartsWith("<@!") || input.StartsWith("<@"))
             {
-                id = Convert.ToUInt64(input.Replace("<@!", "").Replace(">", ""));
+                id = Convert.ToUInt64(input.Replace("<@!", "").Replace(">", "").Replace("<@", ""));
 
                 var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, id);
                 name = restUser.Nickname ?? restUser.Username;

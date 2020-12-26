@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Discord.WebSocket;
 using System.Collections.Generic;
 
 namespace TimeBot.UserData
