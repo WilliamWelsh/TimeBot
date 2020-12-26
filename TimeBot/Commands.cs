@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
@@ -49,6 +50,22 @@ namespace TimeBot
                 var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, id);
                 name = restUser.Nickname ?? restUser.Username;
                 avatarURL = restUser.GetAvatarUrl() ?? restUser.GetDefaultAvatarUrl();
+            }
+
+            // By username
+            else
+            {
+                var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
+                await foreach (var List in Users)
+                {
+                    var targetUser = List.Where(x => string.Equals(input, x.Username, StringComparison.OrdinalIgnoreCase));
+                    if (targetUser.Count() == 1)
+                    {
+                        var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, targetUser.ElementAt(0).Id);
+                        name = restUser.Nickname ?? restUser.Username;
+                        avatarURL = restUser.GetAvatarUrl() ?? restUser.GetDefaultAvatarUrl();
+                    }
+                }
             }
 
             await StatsHandler.DisplayStats(Context.Channel, name, avatarURL, id);

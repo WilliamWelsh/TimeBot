@@ -53,8 +53,8 @@ namespace TimeBot
             var context = new SocketCommandContext(_socketClient, msg);
 
             // Uncommented while testing (my private test server)
-            //if (context.Guild.Id != 735263201612005472)
-            //    return;
+            if (context.Guild.Id != 735263201612005472)
+                return;
 
             int argPos = 0;
             if (msg.HasStringPrefix("!", ref argPos))
