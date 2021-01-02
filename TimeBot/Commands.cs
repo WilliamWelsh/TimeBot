@@ -64,6 +64,7 @@ namespace TimeBot
                         var restUser = await EventHandler._restClient.GetGuildUserAsync(Context.Guild.Id, targetUser.ElementAt(0).Id);
                         name = restUser.Nickname ?? restUser.Username;
                         avatarURL = restUser.GetAvatarUrl() ?? restUser.GetDefaultAvatarUrl();
+                        id = restUser.Id;
                     }
                 }
             }
