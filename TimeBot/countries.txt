@@ -36,8 +36,8 @@ Chile
 China
 Colombia
 Comoros
-Congo, Democratic Republic of the
-Congo, Republic of the
+Democratic Republic of the Congo
+Republic of the Congo
 Costa Rica
 Côte d’Ivoire
 Croatia
@@ -113,7 +113,7 @@ Marshall Islands
 Mauritania
 Mauritius
 Mexico
-Micronesia, Federated States of
+Federated States of Micronesia
 Moldova
 Monaco
 Mongolia
