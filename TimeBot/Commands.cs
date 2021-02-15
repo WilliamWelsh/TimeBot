@@ -4,6 +4,7 @@ using System.Linq;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
+using Discord;
 
 namespace TimeBot
 {
@@ -92,12 +93,21 @@ namespace TimeBot
         public async Task SetSomeoneElsesTime(SocketUser user, double hourDifference) => await StatsHandler.SetSomeonesTime(Context, user, hourDifference);
 
         [Command("tstats")]
-        public async Task ttt()
+        public async Task Stats()
         {
-            int total = 0;
-            foreach (var Guild in Context.Client.Guilds)
-                total += Guild.MemberCount;
-            await Context.Channel.SendMessageAsync($"Servers: {Context.Client.Guilds.Count}\nMembers: {total}");
+            var totalMembers = Context.Client.Guilds.Sum(Guild => Guild.MemberCount);
+
+            await Context.Channel.SendMessageAsync(null, false, new EmbedBuilder()
+                .WithTitle("Bot Info")
+                .WithColor(Utilities.Blue)
+                .WithThumbnailUrl("https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128")
+                .AddField("Library", "Discord.Net")
+                .AddField("Servers", Context.Client.Guilds.Count)
+                .AddField("Members", totalMembers.ToString("#,##0"))
+                .AddField("Developer", "Reverse#0069")
+                .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
+                .AddField("Links", "[Invite](https://discord.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server](https://discord.gg/ga9V5pa)")
+                .Build()).ConfigureAwait(false);
         }
 
         // Set your country
