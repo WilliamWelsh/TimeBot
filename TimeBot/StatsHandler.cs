@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using Discord;
 using System.IO;
 using System.Text;
@@ -9,18 +8,18 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Discord.Rest;
 
 namespace TimeBot
 {
     public static class StatsHandler
     {
+        // List of acceptable countries
         private static List<string> Countries;
 
         // The main embed that displays time for a target
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private static Embed StatsEmbed(UserAccount account, string name, string avatarURL, ulong id) => new EmbedBuilder()
+        private static Embed StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
@@ -45,7 +44,7 @@ namespace TimeBot
         // Display the time (and possibly country) for a target
         public static async Task DisplayStats(ISocketMessageChannel channel, string name, string avatarURL, ulong id)
         {
-            await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL, id));
+            await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL));
         }
 
         // Display the time for users in a certain role
@@ -115,7 +114,7 @@ namespace TimeBot
             // If the target is talking about their self.. just set your own time..?
             if (context.User.Id == target.Id)
             {
-                await SetTime(context, hourDifference);
+                await SetTime(context, hourDifference).ConfigureAwait(false);
                 return;
             }
 
@@ -266,15 +265,13 @@ namespace TimeBot
 
             foreach (var User in Users)
             {
-                if (!User.IsBot)
-                {
-                    TotalUsers++;
-                    var account = UserAccounts.GetAccount(User.Id);
-                    if (account.localTime != 999)
-                        UsersWithTimeSet++;
-                    if (account.country != "Not set.")
-                        UsersWithCountrySet++;
-                }
+                if (User.IsBot) continue;
+                TotalUsers++;
+                var account = UserAccounts.GetAccount(User.Id);
+                if (account.localTime != 999)
+                    UsersWithTimeSet++;
+                if (account.country != "Not set.")
+                    UsersWithCountrySet++;
             }
 
             Text.AppendLine($"Users in Server: {TotalUsers}").AppendLine()

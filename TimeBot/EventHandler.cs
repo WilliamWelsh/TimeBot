@@ -16,8 +16,6 @@ namespace TimeBot
         public static DiscordRestClient _restClient;
         public static CommandService _service;
 
-        private static bool isReady;
-
         public static async Task InitializeAsync(DiscordSocketClient socketClient, DiscordRestClient restClient)
         {
             _socketClient = socketClient;
