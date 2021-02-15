@@ -1,6 +1,8 @@
 # Time Bot
 This bot can provide the local time and country for a user. This is useful if your server has users from around the globe. All they have to do it set it up with a simple command. The data is saved globally, so you can view your time on several servers.  
-<img src="https://img.shields.io/badge/discord-csharp-blue.svg"> [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ee72a439b9c4669a9c122999db57127)](https://app.codacy.com/app/WilliamWelsh/TimeBot?utm_source=github.com&utm_medium=referral&utm_content=WilliamWelsh/TimeBot&utm_campaign=Badge_Grade_Dashboard)
+[<img src="https://discordapp.com/api/guilds/735263201612005472/widget.png?style=shield">](https://discord.gg/ga9V5pa)
+<img src="https://img.shields.io/badge/discord-csharp-blue.svg">
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ee72a439b9c4669a9c122999db57127)](https://app.codacy.com/app/WilliamWelsh/TimeBot?utm_source=github.com&utm_medium=referral&utm_content=WilliamWelsh/TimeBot&utm_campaign=Badge_Grade_Dashboard)
 
 ## Invite
 To invite this bot to your server, click [here](https://discordapp.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot).
