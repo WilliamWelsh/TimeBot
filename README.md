@@ -24,7 +24,7 @@ This bot can provide the local time and country for a user. This is useful if yo
 
 ### Commands
 `!time` View or set up your time and/or country.  
-`!time @mentionedUser` View the time (and possibly country) of a user.
+`!time @mentionedUser` View the time (and possibly country) of a user.  
 `!timesetup` Tutorial on how to set up time and country.  
 `!time set [hour difference]` Set your local time.  
 `!country set [country name]` Set your country.  
