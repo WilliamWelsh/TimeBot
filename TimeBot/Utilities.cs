@@ -24,6 +24,11 @@ namespace TimeBot
         public static readonly ColorThief ColorThief = new ColorThief();
 
         /// <summary>
+        /// Return an embed field
+        /// </summary>
+        public static EmbedFieldBuilder MakeEmbedField(string name, string value) => new EmbedFieldBuilder().WithName(name).WithValue(value).WithIsInline(false);
+
+        /// <summary>
         /// Print a red error message.
         /// </summary>
         public static async Task PrintError(this ISocketMessageChannel channel, string message) => await channel.PrintEmbed("Error", message, Red).ConfigureAwait(false);
@@ -61,5 +66,71 @@ namespace TimeBot
         /// <param name="offset">The amount of hours to add to the current time.</param>
         /// <returns></returns>
         public static string GetTime(double offset) => DateTime.Now.AddHours(offset).ToString("h:mm tt");
+
+        /// <summary>
+        /// Get the emoji for a country
+        /// </summary>
+        public static string GetCountryFlag(string country)
+        {
+            switch (country)
+            {
+                case "Australia":
+                    return "🇦🇺";
+
+                case "Canada":
+                    return "🇨🇦";
+
+                case "China":
+                    return "🇨🇳";
+
+                case "Djibouti":
+                    return "🇩🇯";
+
+                case "Latvia":
+                    return "🇱🇻";
+
+                case "Germany":
+                    return "🇩🇪";
+
+                case "France":
+                    return "🇫🇷";
+
+                case "Poland":
+                    return "🇵🇱";
+
+                case "Mexico":
+                    return "🇲🇽";
+
+                case "Turkey":
+                    return "🇹🇷";
+
+                case "Uruguay":
+                    return "🇺🇾";
+
+                case "Philippines":
+                    return "🇵🇭";
+
+                case "Denmark":
+                    return "🇩🇰";
+
+                case "Netherlands":
+                    return "🇳🇱";
+
+                case "Scotland":
+                    return "";
+
+                case "Sweden":
+                    return "🇸🇪";
+
+                case "United Kingdom":
+                    return "🇬🇧";
+
+                case "United States":
+                    return "🇺🇸";
+
+                default:
+                    return "";
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Xml.Schema;
 
 namespace TimeBot
 {
@@ -214,20 +215,60 @@ namespace TimeBot
         }
 
         // Display Country for everyone (requested feature)
-        public static async Task DisplayEveryonesCountry(SocketCommandContext Context)
+        public static async Task DisplayEveryonesTimeByCountry(SocketCommandContext Context)
         {
+            // Get a list of valid accounts
+            // Valid account: A user that isn't a bot and has their country set up
             var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
-            var text = new StringBuilder();
+            var validAccounts = new List<CountryListItem>();
             await foreach (var List in Users)
             {
                 foreach (var User in List)
                 {
-                    if (!User.IsBot)
-                        text.AppendLine($"{User.Nickname ?? User.Username} - {UserAccounts.GetAccount(User.Id).country}");
+                    var account = UserAccounts.GetAccount(User.Id);
+                    if (!User.IsBot && account.country != "Not set.")
+                        validAccounts.Add(new CountryListItem
+                        {
+                            User = User,
+                            UserAccount = account
+                        });
                 }
             }
 
-            await SendPossiblyLongEmbed(Context.Channel, "Everyone's Country", text.ToString()).ConfigureAwait(false);
+            // Sort them by country name (alphabetical)
+            // Then by time (earliest to latest)
+            validAccounts = validAccounts.OrderBy(x => x.UserAccount.country)
+                .ThenBy(x => x.UserAccount.localTime)
+                .ToList();
+
+            // Get a list of all the unique country name
+            var countryNames = new HashSet<string>(validAccounts.Aggregate("", (current, x) => current + $" {x.UserAccount.country.Replace(" ", "_")}").Split(' '));
+
+            // Create the result
+            var embedFields = new List<EmbedFieldBuilder>();
+            foreach (var countryName in countryNames)
+            {
+                // First one is whitespace for some reason?
+                if (string.IsNullOrEmpty(countryName)) continue;
+
+                // We had to put underscores in for the hashtable
+                var actualCountryName = countryName.Replace("_", " ");
+
+                // Get all users that have this country name
+                var users = from a in validAccounts
+                            where a.UserAccount.country == actualCountryName
+                            select a;
+
+                // Write everyone's time
+                embedFields.Add(Utilities.MakeEmbedField($"{actualCountryName} {Utilities.GetCountryFlag(actualCountryName)}", users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {Utilities.GetTime(user.UserAccount.localTime)}\n")));
+            }
+
+            // Send the result
+            await Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
+                .WithTitle("Everyone's Time by Country")
+                .WithColor(Utilities.Blue)
+                .WithFields(embedFields)
+                .Build());
         }
 
         // Send an embed that might have over 2048 characters, so send it as multiple messages if it is

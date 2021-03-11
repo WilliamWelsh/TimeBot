@@ -82,7 +82,7 @@ namespace TimeBot
 
         // Display everyone's country
         [Command("countryall")]
-        public async Task DisplayEveryonesCountry() => await StatsHandler.DisplayEveryonesCountry(Context);
+        public async Task DisplayEveryonesCountry() => await StatsHandler.DisplayEveryonesTimeByCountry(Context);
 
         // Set your time
         [Command("time set")]
