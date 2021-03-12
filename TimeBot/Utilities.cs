@@ -117,7 +117,7 @@ namespace TimeBot
                     return "🇳🇱";
 
                 case "Scotland":
-                    return "";
+                    return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
 
                 case "Sweden":
                     return "🇸🇪";
