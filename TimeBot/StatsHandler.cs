@@ -260,8 +260,11 @@ namespace TimeBot
                             select a;
 
                 // Write everyone's time
-                embedFields.Add(Utilities.MakeEmbedField($"{actualCountryName} {Utilities.GetCountryFlag(actualCountryName)}", users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {Utilities.GetTime(user.UserAccount.localTime)}\n")));
+                embedFields.Add(Utilities.MakeEmbedField($"{actualCountryName} {Utilities.GetCountryFlag(actualCountryName)}", $"{users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {Utilities.GetTime(user.UserAccount.localTime)}\n")}\u200B"));
             }
+
+            // Remove last blank line
+            embedFields.Last().Value = embedFields.Last().Value.ToString().Replace("\u200B", "");
 
             // Send the result
             await Context.Channel.SendMessageAsync("", false, new EmbedBuilder()
