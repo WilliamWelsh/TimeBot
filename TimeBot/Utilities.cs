@@ -128,6 +128,33 @@ namespace TimeBot
                 case "United States":
                     return "🇺🇸";
 
+                case "Bangladesh":
+                    return "🇧🇩";
+
+                case "Ethiopia":
+                    return "🇪🇹";
+
+                case "India":
+                    return "🇮🇳";
+
+                case "Indonesia":
+                    return "🇮🇩";
+
+                case "Lebanon":
+                    return "🇱🇧";
+
+                case "Morocco":
+                    return "🇲🇦";
+
+                case "Norway":
+                    return "🇳🇴";
+
+                case "Pakistan":
+                    return "🇵🇰";
+
+                case "Ukraine":
+                    return "🇺🇦";
+
                 default:
                     return "";
             }
