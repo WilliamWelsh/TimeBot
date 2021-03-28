@@ -155,6 +155,9 @@ namespace TimeBot
                 case "Ukraine":
                     return "🇺🇦";
 
+                case "Singapore":
+                    return "🇸🇬";
+
                 default:
                     return "";
             }
