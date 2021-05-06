@@ -158,6 +158,12 @@ namespace TimeBot
                 case "Singapore":
                     return "🇸🇬";
 
+                case "Ireland":
+                    return "🇮🇪";
+
+                case "Dominica":
+                    return "🇩🇲";
+
                 default:
                     return "";
             }
