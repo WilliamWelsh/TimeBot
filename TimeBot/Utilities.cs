@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
-using System.Net;
 using Discord;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using Discord.WebSocket;
-using System.Threading.Tasks;
-using ColorThiefDotNet;
 using Color = Discord.Color;
+using System.Threading.Tasks;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace TimeBot
 {
@@ -18,10 +18,8 @@ namespace TimeBot
         public static readonly Color Red = new Color(231, 76, 60);
         public static readonly Color Green = new Color(31, 139, 76);
 
-        /// <summary>
-        /// ColorThief (used to extract dominant color from images)
-        /// </summary>
-        public static readonly ColorThief ColorThief = new ColorThief();
+        // Http Client
+        private static HttpClient HttpClient = new HttpClient();
 
         /// <summary>
         /// Return an embed field
@@ -47,16 +45,15 @@ namespace TimeBot
                 .WithDescription(message)
                 .Build());
 
-        public static Color GetUserColor(string avatarURL)
+        /// <summary>
+        /// Get the average color for a user's profile picture
+        /// </summary>
+        public static async Task<Color> GetUserColor(string avatarURL)
         {
-            // Download the avatar
-            using (var client = new WebClient())
-            using (var ms = new MemoryStream(client.DownloadData(avatarURL)))
-            using (var avatar = new Bitmap(System.Drawing.Image.FromStream(ms)))
+            using (var ms = new MemoryStream(await HttpClient.GetByteArrayAsync(avatarURL)))
             {
-                // Get the color and convert it to a Discord color
-                var color = ColorThief.GetColor(avatar, 10, false).Color; // TODO check for white
-                return new Color(color.R, color.G, color.B);
+                var palette = DominantColorFinder.GetPalette((SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms));
+                return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
             }
         }
 

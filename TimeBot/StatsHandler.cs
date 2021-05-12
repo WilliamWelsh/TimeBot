@@ -20,13 +20,13 @@ namespace TimeBot
         // The main embed that displays time for a target
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private static Embed StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
+        private static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
                 //.WithDescription(GetTime(account, user))
                 .WithDescription($"{GetTime(account, name)}")
-                .WithColor(Utilities.GetUserColor(avatarURL))
+                .WithColor(await Utilities.GetUserColor(avatarURL))
                 .WithFooter(GetCountry(account))
                 .Build();
 
@@ -45,7 +45,7 @@ namespace TimeBot
         // Display the time (and possibly country) for a target
         public static async Task DisplayStats(ISocketMessageChannel channel, string name, string avatarURL, ulong id)
         {
-            await channel.SendMessageAsync("", false, StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL));
+            await channel.SendMessageAsync("", false, await StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL));
         }
 
         // Display the time for users in a certain role
