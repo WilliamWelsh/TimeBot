@@ -35,7 +35,7 @@ This bot can provide the local time and country for a user. This is useful if yo
 `!timehelp` View the help menu.  
 
 ## Countries
-[Countries.txt](https://github.com/WilliamWelsh/TimeBot/blob/master/TimeBot/countries.txt) is a list of all valid countries. If one is missing, please tell me either on Discord (Reverse#1193) or on GitHub.
+[Countries.txt](https://github.com/WilliamWelsh/TimeBot/blob/master/TimeBot/countries.txt) is a list of all valid countries. If one is missing, please tell me either on Discord (Reverse#0069) or here on GitHub.
 
 ## Images
 ![Example](https://i.imgur.com/VynC3uB.png)  
