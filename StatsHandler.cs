@@ -8,7 +8,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Xml.Schema;
 
 namespace TimeBot
 {
@@ -24,7 +23,6 @@ namespace TimeBot
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
-                //.WithDescription(GetTime(account, user))
                 .WithDescription($"{GetTime(account, name)}")
                 .WithColor(await Utilities.GetUserColor(avatarURL))
                 .WithFooter(GetCountry(account))
@@ -40,13 +38,12 @@ namespace TimeBot
         }
 
         // Display a User's country
-        public static string GetCountry(UserAccount account) => account.country == "Not set." ? "" : account.country;
+        public static string GetCountry(UserAccount account)
+            => account.country == "Not set." ? "" : account.country;
 
         // Display the time (and possibly country) for a target
         public static async Task DisplayStats(ISocketMessageChannel channel, string name, string avatarURL, ulong id)
-        {
-            await channel.SendMessageAsync("", false, await StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL));
-        }
+            => await channel.SendMessageAsync("", false, await StatsEmbed(UserAccounts.GetAccount(id), name, avatarURL));
 
         // Display the time for users in a certain role
         public static async Task DisplayStats(SocketCommandContext Context, SocketRole Role)
