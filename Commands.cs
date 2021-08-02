@@ -71,6 +71,12 @@ namespace TimeBot
             }
 
             await StatsHandler.DisplayStats(Context.Channel, name, avatarURL, id);
+
+            await Context.Channel.SendMessageAsync(null, false, new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithImageUrl("https://cdn.discordapp.com/attachments/735282082963652749/871855263962005524/unknown.png")
+                .WithDescription("!! ATTENTION !!\n\nThe bot is moving to SLASH commands. Please re-invite the bot using the link below, and then use SLASH commands. For example:\n/time @user\n\nIf you need any help join the support server: https://discord.gg/ga9V5pa\n\nRE-INVITE THE BOT USING THIS LINK: https://discord.com/oauth2/authorize?client_id=529569000028373002&permissions=0&scope=bot%20applications.commands\n\nYou must start using SLASH commands, the `!` commands will be removed soon.")
+                .Build());
         }
 
         [Command("time")]

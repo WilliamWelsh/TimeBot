@@ -19,7 +19,7 @@ namespace TimeBot
         public static readonly Color Green = new Color(31, 139, 76);
 
         // Http Client
-        private static HttpClient HttpClient = new HttpClient();
+        public static HttpClient HttpClient = new HttpClient();
 
         /// <summary>
         /// Return an embed field
@@ -55,6 +55,19 @@ namespace TimeBot
                 var palette = DominantColorFinder.GetPalette((SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms));
                 return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
             }
+        }
+
+        public static async Task<string> GetUserColorForSlash(string avatarURL)
+        {
+            var palette = DominantColorFinder.GetPalette(await DownloadImage(avatarURL));
+            var color = new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
+            return Convert.ToInt32($"{color.R:X2}{color.G:X2}{color.B:X2}", 16).ToString();
+        }
+
+        public static async Task<SixLabors.ImageSharp.Image<Rgba32>> DownloadImage(string URL)
+        {
+            using (var ms = new MemoryStream(await HttpClient.GetByteArrayAsync(URL)))
+                return (SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms);
         }
 
         /// <summary>

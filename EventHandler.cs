@@ -7,6 +7,7 @@ using System.Reflection;
 using Discord.WebSocket;
 using DiscordBotsList.Api;
 using System.Threading.Tasks;
+using TimeBot.Interactions;
 
 namespace TimeBot
 {
@@ -29,6 +30,20 @@ namespace TimeBot
             _service.Log += Log;
 
             _socketClient.Ready += OnReady;
+
+            _socketClient.InteractionCreated += OnInteractionCreated;
+        }
+
+        private static async Task OnInteractionCreated(SocketInteraction interaction)
+        {
+            try
+            {
+                await SlashCommands.SearchCommands(interaction);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         private static async Task OnReady()

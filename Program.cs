@@ -26,7 +26,8 @@ namespace TimeBot
             var _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers
+                GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers,
+                AlwaysAcknowledgeInteractions = false
             });
             _client.Log += Log;
 
@@ -35,7 +36,7 @@ namespace TimeBot
 
             // Set up the event handler
             await EventHandler.InitializeAsync(_client, _restClient);
-            await _client.SetGameAsync("!timehelp");
+            await _client.SetGameAsync("/timehelp");
 
             // Set up the list of valid countries
             StatsHandler.SetupCountryList();
