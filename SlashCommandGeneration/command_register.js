@@ -1,21 +1,15 @@
 const DiscordJS = require("discord.js");
 require("dotenv").config();
 
-//const guildId = "735263201612005472";
 const client = new DiscordJS.Client();
 
 const getApp = () => {
   const app = client.api.applications(client.user.id);
-  // if (guildId) {
-  //   app.guilds(guildId);
-  // }
   return app.commands;
 };
 
 client.on("ready", async () => {
   console.log("Ready");
-
-  // const commands = await getApp(guildId).commands.get();
 
   // /time
   await getApp().post({
@@ -27,7 +21,7 @@ client.on("ready", async () => {
           name: "user",
           description: "The user you want to see the time for",
           required: false,
-          type: 6, // 3 = string
+          type: 6, // 6 = user
         },
       ],
     },
@@ -42,7 +36,7 @@ client.on("ready", async () => {
           name: "user",
           description: "The user you want to see the time for",
           required: false,
-          type: 6, // 3 = string
+          type: 6, // 6 = user
         },
       ],
     },
@@ -50,7 +44,7 @@ client.on("ready", async () => {
 
   await getApp().post({
     data: {
-      name: "timstats",
+      name: "timestats",
       description: "View the stats for the bot",
     },
   });

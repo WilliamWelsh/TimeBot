@@ -64,6 +64,10 @@ namespace TimeBot.Interactions
                     await interaction.SetCountry();
                     break;
 
+                case "timestats":
+                    await interaction.ShowStats();
+                    break;
+
                 default:
                     break;
             }

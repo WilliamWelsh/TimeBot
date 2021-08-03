@@ -247,28 +247,29 @@ namespace TimeBot.Interactions
                     {
                         title = "Time Bot Help",
                         description = "Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.",
-                        color = 8365776,
+                        color = "8365776",
                         fields = new[]
                         {
                             new
                             {
                                 name = "Commands",
-                                description = "`/timesetup` Help on setting up your time (and country if you want)\n`/time` View your time.\n`/time @mentionedUser` View a target's local time.\n`/timeset [number]` Set your local time.\n`/countryset [country name]`Set your country."
+                                value = "`/timesetup` Help on setting up your time (and country if you want)\n`/time` View your time.\n`/time @mentionedUser` View a target's local time.\n`/timeset [number]` Set your local time.\n`/countryset [country name]`Set your country.",
+                                //inline = false
                             },
                             new
                             {
                                 name = "Additional Help",
-                                description = "You can ask on GitHub or the support server (https://discord.gg/ga9V5pa) for additional help.\n\nOr add the Developer: Reverse#0069"
+                                value = "You can ask on GitHub or the support server (https://discord.gg/ga9V5pa) for additional help.\n\nOr add the Developer: Reverse#0069"
                             },
                             new
                             {
                                 name = "Invite Link",
-                                description = "https://discord.com/oauth2/authorize?client_id=529569000028373002&permissions=0&scope=bot%20applications.commands"
+                                value = "https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands"
                             },
                             new
                             {
                                 name = "GitHub",
-                                description = "https://github.com/WilliamWelsh/TimeBot"
+                                value = "https://github.com/WilliamWelsh/TimeBot"
                             }
                         }
                     }
@@ -281,7 +282,7 @@ namespace TimeBot.Interactions
         // /timeset
         public static async Task SetTime(this SocketInteraction interaction)
         {
-            var hourDifference = Convert.ToInt32(interaction.Data.Options.ElementAt(0).Value.ToString());
+            var hourDifference = Convert.ToDouble(interaction.Data.Options.ElementAt(0).Value.ToString());
 
             if (hourDifference < -24 || hourDifference > 24)
             {
@@ -348,6 +349,62 @@ namespace TimeBot.Interactions
                         title = "Success",
                         description = $"You have successfully set your country to {account.country}.\n\nIf this is an error, you can run `/countryset [country name]` again.",
                         color = 2067276
+                    }
+                }
+            };
+
+            await interaction.RespondImmediately(new StringContent(JsonConvert.SerializeObject(interactionResponse), Encoding.UTF8, "application/json"));
+        }
+
+        // /timestats
+        public static async Task ShowStats(this SocketInteraction interaction)
+        {
+            var totalMembers = EventHandler._socketClient.Guilds.Sum(Guild => Guild.MemberCount);
+
+            dynamic interactionResponse = new ExpandoObject();
+            interactionResponse.type = 4;
+            interactionResponse.data = new
+            {
+                embeds = new[]
+                {
+                    new
+                    {
+                        title = "Bot Info",
+                        thumbnail_url = "https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128",
+                        color = 8365776,
+                        fields = new[]
+                        {
+                            new
+                            {
+                                name = "Library",
+                                value = "Discord.Net"
+                            },
+                            new
+                            {
+                                name = "Servers",
+                                value = EventHandler._socketClient.Guilds.Count.ToString()
+                            },
+                            new
+                            {
+                                name = "Members",
+                                value = totalMembers.ToString("#,##0")
+                            },
+                            new
+                            {
+                                name = "Developer",
+                                value = "Reverse#006"
+                            },
+                            new
+                            {
+                                name = "Color",
+                                value = "Suggested Role Color for Me: `#7fa6d0`"
+                            },
+                            new
+                            {
+                                name = "Links",
+                                value = "[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server](https://discord.gg/ga9V5pa)"
+                            }
+                        }
                     }
                 }
             };

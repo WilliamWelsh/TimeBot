@@ -1,6 +1,7 @@
 ﻿using System;
 using Discord;
 using System.IO;
+using System.Linq;
 using Discord.Rest;
 using Discord.Commands;
 using System.Reflection;

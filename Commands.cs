@@ -75,7 +75,7 @@ namespace TimeBot
             await Context.Channel.SendMessageAsync(null, false, new EmbedBuilder()
                 .WithColor(Utilities.Blue)
                 .WithImageUrl("https://cdn.discordapp.com/attachments/735282082963652749/871855263962005524/unknown.png")
-                .WithDescription("!! ATTENTION !!\n\nThe bot is moving to SLASH commands. Please re-invite the bot using the link below, and then use SLASH commands. For example:\n/time @user\n\nIf you need any help join the support server: https://discord.gg/ga9V5pa\n\nRE-INVITE THE BOT USING THIS LINK: https://discord.com/oauth2/authorize?client_id=529569000028373002&permissions=0&scope=bot%20applications.commands\n\nYou must start using SLASH commands, the `!` commands will be removed soon.")
+                .WithDescription("!! ATTENTION !!\n\nThe bot is moving to SLASH commands. Please re-invite the bot using the link below, and then use SLASH commands. For example:\n/time @user\n\nIf you need any help join the support server: https://discord.gg/ga9V5pa\n\nRE-INVITE THE BOT USING THIS LINK: https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands\n\nYou must start using SLASH commands, the `!` commands will be removed soon.\n\n\nUse the SLASH command `/time @user` after reinvting the bot and this message will stop posting.")
                 .Build());
         }
 
@@ -112,7 +112,7 @@ namespace TimeBot
                 .AddField("Members", totalMembers.ToString("#,##0"))
                 .AddField("Developer", "Reverse#0069")
                 .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
-                .AddField("Links", "[Invite](https://discord.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server](https://discord.gg/ga9V5pa)")
+                .AddField("Links", "[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server](https://discord.gg/ga9V5pa)")
                 .Build()).ConfigureAwait(false);
         }
 
