@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace TimeBot.Interactions
 {
@@ -16,10 +17,17 @@ namespace TimeBot.Interactions
     public static class SlashCommands
     {
         // Search for a slash command
-        public static async Task SearchCommands(SocketInteraction interaction)
+        public static async Task SearchCommands(SocketInteraction interaction, JToken payload)
         {
             switch (interaction.Data.Name)
             {
+                case "Time":
+                    var properties = payload["data"]["resolved"]["members"].OfType<JProperty>().ElementAt(0).Name;
+                    ulong userID;
+                    if (ulong.TryParse(properties, NumberStyles.None, CultureInfo.InvariantCulture, out userID))
+                        await interaction.ShowTime(await EventHandler._restClient.GetGuildUserAsync(interaction.Guild.Id, userID));
+                    break;
+
                 case "time":
                     if (interaction.Data.Options == null)
                         await interaction.ShowTime(interaction.User);

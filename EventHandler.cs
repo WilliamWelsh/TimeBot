@@ -8,6 +8,7 @@ using System.Reflection;
 using Discord.WebSocket;
 using DiscordBotsList.Api;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using TimeBot.Interactions;
 
 namespace TimeBot
@@ -35,11 +36,11 @@ namespace TimeBot
             _socketClient.InteractionCreated += OnInteractionCreated;
         }
 
-        private static async Task OnInteractionCreated(SocketInteraction interaction)
+        private static async Task OnInteractionCreated(SocketInteraction interaction, JToken payload)
         {
             try
             {
-                await SlashCommands.SearchCommands(interaction);
+                await SlashCommands.SearchCommands(interaction, payload);
             }
             catch (Exception e)
             {
