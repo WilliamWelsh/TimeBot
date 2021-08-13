@@ -174,6 +174,18 @@ namespace TimeBot
                 case "Dominica":
                     return "🇩🇲";
 
+                case "Malaysia":
+                    return "🇲🇾";
+
+                case "Nepal":
+                    return "🇳🇵";
+
+                case "Hong Kong":
+                    return "🇭🇰";
+
+                case "Vietnam":
+                    return "🇻🇳";
+
                 default:
                     return "";
             }
