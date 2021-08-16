@@ -186,6 +186,9 @@ namespace TimeBot
                 case "Vietnam":
                     return "🇻🇳";
 
+                case "Nigeria":
+                    return "🇳🇬";
+
                 default:
                     return "";
             }
