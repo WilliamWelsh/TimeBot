@@ -23,21 +23,20 @@ This bot can provide the local time and country for a user. This is useful if yo
 [Click me to invite the bot to your server.](https://discordapp.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot)
 
 ### Commands
-`!time` View or set up your time and/or country.  
-`!time @mentionedUser` View the time (and possibly country) of a user.  
-`!timesetup` Tutorial on how to set up time and country.  
-`!time set [hour difference]` Set your local time.  
-`!country set [country name]` Set your country.  
-`!timeall` View the time for everyone.  
-`!countryall` View the time for everyone (grouped by country).  
-
-### Help
-`!timehelp` View the help menu.  
+`/time` View or set up your time and/or country.  
+`/time @mentionedUser` View the time (and possibly country) of a user.  
+`/timesetup` Tutorial on how to set up time and country.  
+`/timeset [hour difference]` Set your local time.  
+`/countryset [country name]` Set your country.  
+`/timeall` View the time for everyone.  
+`/countryall` View the time for everyone (grouped by country).  
+`/timehelp` View the help menu.  
+`/timestats` View stats for the bot.  
 
 ## Countries
 [Countries.txt](https://github.com/WilliamWelsh/TimeBot/blob/master/TimeBot/countries.txt) is a list of all valid countries. If one is missing, please tell me either on Discord (Reverse#0069) or here on GitHub.
 
 ## Images
-![Example](https://i.imgur.com/VynC3uB.png)  
-![ExampleTwo](https://i.imgur.com/NKXpsI5.png)    
-![setup](https://i.imgur.com/LBiQPXy.png)
+![image](https://user-images.githubusercontent.com/16886888/135763350-336c2abc-e5bd-4358-b363-ac5136f3fece.png)  
+![Context Menu Command](https://user-images.githubusercontent.com/16886888/135763364-efc0c172-16a8-4464-b558-6687f8003854.png)  
+![Countryall Command](https://user-images.githubusercontent.com/16886888/135763372-5af94946-a109-45ac-b219-b891cb38cf57.png)  
