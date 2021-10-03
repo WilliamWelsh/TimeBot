@@ -19,7 +19,7 @@ namespace TimeBot
         // The main embed that displays time for a target
         // If they don't have a country set, then the footer will be blank
         // This is to avoid a constant "no country set" message for users that don't want to set their country
-        private static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
+        public static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))

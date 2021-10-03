@@ -1,115 +1,57 @@
-﻿using System;
-using System.Dynamic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace TimeBot.Interactions
 {
-    // I know this is bad, but at the time of writing this,
-    // Discord.NET doesn't formally support slash commands or interactions in general
-    // So this is my workaround until they officially support it
     public static class SlashCommands
     {
         // Search for a slash command
-        public static async Task SearchCommands(SocketInteraction interaction, JToken payload)
+        public static async Task SearchCommands(SocketSlashCommand command)
         {
-            switch (interaction.Data.Name)
+            switch (command.CommandName)
             {
-                case "Time":
-                    var properties = payload["data"]["resolved"]["members"].OfType<JProperty>().ElementAt(0).Name;
-                    ulong userID;
-                    if (ulong.TryParse(properties, NumberStyles.None, CultureInfo.InvariantCulture, out userID))
-                        await interaction.ShowTime(await EventHandler._restClient.GetGuildUserAsync(interaction.Guild.Id, userID));
-                    break;
-
                 case "time":
-                    if (interaction.Data.Options == null)
-                        await interaction.ShowTime(interaction.User);
+                    if (command.Data.Options == null)
+                        await command.ShowTime((SocketGuildUser)command.User);
                     else
-                    {
-                        ulong id;
-
-                        if (ulong.TryParse(interaction.Data.Options.ElementAt(0).Value.ToString(), NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                            await interaction.ShowTime(await EventHandler._restClient.GetGuildUserAsync(interaction.Guild.Id, id));
-                    }
+                        await command.ShowTime(await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
 
                 case "country":
-                    if (interaction.Data.Options == null)
-                        await interaction.ShowCountry(interaction.User);
+                    if (command.Data.Options == null)
+                        await command.ShowCountry((SocketGuildUser)command.User);
                     else
-                    {
-                        ulong id;
-
-                        if (ulong.TryParse(interaction.Data.Options.ElementAt(0).Value.ToString(), NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                            await interaction.ShowCountry(await EventHandler._restClient.GetGuildUserAsync(interaction.Guild.Id, id));
-                    }
+                        await command.ShowCountry(await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
 
                 case "timeall":
-                    await interaction.ShowTimeForAll();
+                    await command.ShowTimeForAll();
                     break;
 
                 case "countryall":
-                    await interaction.ShowCountryForAll();
+                    await command.ShowCountryForAll();
                     break;
 
                 case "timehelp":
-                    await interaction.ShowTimeHelp();
+                    await command.ShowTimeHelp();
                     break;
 
                 case "timeset":
-                    await interaction.SetTime();
+                    await command.SetTime();
                     break;
 
                 case "countryset":
-                    await interaction.SetCountry();
+                    await command.SetCountry();
                     break;
 
                 case "timestats":
-                    await interaction.ShowStats();
+                    await command.ShowStats();
                     break;
 
                 default:
                     break;
             }
-        }
-
-        // Follow up with some content
-        public static async Task RespondImmediately(this SocketInteraction interaction, StringContent content)
-        {
-            var response = await Utilities.HttpClient.PostAsync($"https://discord.com/api/v8/interactions/{interaction.Id}/{interaction.Token}/callback", content);
-
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            Console.WriteLine(responseString);
-        }
-
-        // Respond with an error immediately
-        public static async Task ImmediateError(this SocketInteraction interaction, string description)
-        {
-            dynamic interactionResponse = new ExpandoObject();
-            interactionResponse.type = 4;
-            interactionResponse.data = new
-            {
-                embeds = new[]
-                {
-                    new
-                    {
-                        title = "Error",
-                        description,
-                        color = "15158332"
-                    }
-                }
-            };
-
-            await interaction.RespondImmediately(new StringContent(JsonConvert.SerializeObject(interactionResponse), Encoding.UTF8, "application/json"));
         }
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
 using Discord;
 using System.IO;
-using System.Linq;
 using Discord.Rest;
 using Discord.Commands;
 using System.Reflection;
 using Discord.WebSocket;
 using DiscordBotsList.Api;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using TimeBot.Interactions;
+using TimeBot.UserData;
 
 namespace TimeBot
 {
@@ -36,15 +35,23 @@ namespace TimeBot
             _socketClient.InteractionCreated += OnInteractionCreated;
         }
 
-        private static async Task OnInteractionCreated(SocketInteraction interaction, JToken payload)
+        private static async Task OnInteractionCreated(SocketInteraction arg)
         {
-            try
+            switch (arg)
             {
-                await SlashCommands.SearchCommands(interaction, payload);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
+                // Slash Commands
+                case SocketSlashCommand slashCommand:
+                    await SlashCommands.SearchCommands(slashCommand);
+                    break;
+
+                // User Commands (context menu)
+                case SocketUserCommand userCommand:
+                    var user = (SocketGuildUser) userCommand.Data.Member;
+                    await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+                    break;
+
+                default:
+                    break;
             }
         }
 

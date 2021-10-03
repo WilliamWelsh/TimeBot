@@ -26,8 +26,7 @@ namespace TimeBot
             var _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers,
-                AlwaysAcknowledgeInteractions = false
+                GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers
             });
             _client.Log += Log;
 
