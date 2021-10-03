@@ -1,11 +1,9 @@
 ﻿using System;
 using Discord;
-using System.IO;
 using Discord.Rest;
 using Discord.Commands;
 using System.Reflection;
 using Discord.WebSocket;
-using DiscordBotsList.Api;
 using System.Threading.Tasks;
 using TimeBot.Interactions;
 using TimeBot.UserData;
@@ -30,8 +28,6 @@ namespace TimeBot
 
             _service.Log += Log;
 
-            _socketClient.Ready += OnReady;
-
             _socketClient.InteractionCreated += OnInteractionCreated;
         }
 
@@ -53,13 +49,6 @@ namespace TimeBot
                 default:
                     break;
             }
-        }
-
-        private static async Task OnReady()
-        {
-            var DblAPI = new AuthDiscordBotListApi(529569000028373002, File.ReadAllText("Resources/dblToken.txt"));
-            var me = await DblAPI.GetMeAsync();
-            await me.UpdateStatsAsync(_socketClient.Guilds.Count);
         }
 
         private static Task Log(LogMessage arg)
