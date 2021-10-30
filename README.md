@@ -20,7 +20,7 @@ Time Bot for Discord
 This bot can provide the local time and country for a user. This is useful if your server has users from around the globe. All they have to do it set it up with a simple command. The data is saved globally, so you can view your time on several servers.  
 
 ### Inviting to Your Server
-[Click me to invite the bot to your server.](https://discordapp.com/oauth2/authorize?client_id=529569000028373002&permissions=68608&scope=bot)
+[Click me to invite the bot to your server.](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands)
 
 ### Commands
 `/time` View or set up your time and/or country.  
