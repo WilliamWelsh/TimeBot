@@ -195,6 +195,12 @@ namespace TimeBot
                 case "Ghana":
                     return "🇬🇭";
 
+                case "Jamaica":
+                    return "🇯🇲";
+
+                case "Jordan":
+                    return "🇯🇴";
+
                 default:
                     return "";
             }
