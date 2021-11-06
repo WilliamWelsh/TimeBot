@@ -56,7 +56,8 @@ namespace TimeBot.Interactions
         public static async Task ShowTimeForAll(this SocketSlashCommand command)
         {
             var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
-            var text = new StringBuilder();
+            var firstLine = new StringBuilder();
+            var secondLIne = new StringBuilder();
             await foreach (var List in Users)
             {
                 foreach (var User in List)
@@ -65,17 +66,29 @@ namespace TimeBot.Interactions
 
                     var account = UserAccounts.GetAccount(User.Id);
 
-                    text.AppendLine(account.localTime == 999
+                    var text = account.localTime == 999
                         ? $"{User.Nickname ?? User.Username} - No Time Set"
-                        : $"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}");
+                        : $"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}";
+
+                    if (firstLine.ToString().Length < 1800)
+                        firstLine.AppendLine(text);
+                    else
+                        secondLIne.AppendLine(text);
                 }
             }
 
             await command.RespondAsync(embed: new EmbedBuilder()
                 .WithColor(Utilities.Blue)
                 .WithTitle("Time for All")
-                .WithDescription(text.ToString())
+                .WithDescription(firstLine.ToString())
                 .Build());
+
+            if (secondLIne.ToString().Length > 0)
+                await command.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    .WithColor(Utilities.Blue)
+                    .WithTitle("Time for All")
+                    .WithDescription(secondLIne.ToString())
+                    .Build());
         }
 
         // /countryall
