@@ -23,12 +23,14 @@ namespace TimeBot.Interactions
         {
             var avatarURL = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
 
+            var country = StatsHandler.GetCountry(UserAccounts.GetAccount(user.Id));
+
             await command.RespondAsync(embed: new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(StatsHandler.GetCountry(UserAccounts.GetAccount(user.Id)))
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
 
@@ -205,7 +207,7 @@ namespace TimeBot.Interactions
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
                     .WithDescription(
-                        "Country not valid. Please try again.\n\nExamples:\n`/countryset united states`\n`/country set united kingdom`\n`/country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt")
+                        "Country not valid. Please try again.\n\nExamples:\n`/countryset united states`\n`/countryset united kingdom`\n`/countryset canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/countries.txt")
                     .WithColor(Utilities.Red)
                     .Build());
                 return;
