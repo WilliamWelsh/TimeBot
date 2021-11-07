@@ -1,4 +1,5 @@
-﻿using Discord.Rest;
+﻿using System;
+using Discord.Rest;
 
 namespace TimeBot.UserData
 {
@@ -6,5 +7,6 @@ namespace TimeBot.UserData
     {
         public RestGuildUser User { get; set; }
         public UserAccount UserAccount { get; set; }
+        public DateTime Time { get; set; }
     }
 }

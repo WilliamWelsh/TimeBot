@@ -13,16 +13,10 @@ namespace TimeBot.Interactions
     public static class SlashFunctions
     {
         // /time (SocketGuildUser)
-        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user)
-        {
-            await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
-        }
+        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
 
         // /time (RestUser)
-        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user)
-        {
-            await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
-        }
+        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
 
         // /country (SocketGuildUser)
         public static async Task ShowCountry(this SocketSlashCommand command, SocketGuildUser user)
@@ -43,12 +37,14 @@ namespace TimeBot.Interactions
         {
             var avatarURL = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
 
+            var country = StatsHandler.GetCountry(UserAccounts.GetAccount(user.Id));
+
             await command.RespondAsync(embed: new EmbedBuilder()
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(StatsHandler.GetCountry(UserAccounts.GetAccount(user.Id)))
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
 
@@ -63,29 +59,30 @@ namespace TimeBot.Interactions
                 foreach (var User in List)
                 {
                     var account = UserAccounts.GetAccount(User.Id);
-                    if (!User.IsBot && account.localTime != 999)
+                    if (!User.IsBot && account.timeZoneId != "Not set.")
                         validAccounts.Add(new ListItem
                         {
                             User = User,
-                            UserAccount = account
+                            UserAccount = account,
+                            Time = TimeZones.GetRawTimeByTimeZone(account.timeZoneId)
                         });
                 }
             }
 
             // Sort by earliest time to latest
-            var sortedList = validAccounts.OrderBy(u => u.UserAccount.localTime);
+            var sortedList = validAccounts.OrderBy(u => u.Time);
 
             var firstLine = new StringBuilder();
             var secondLIne = new StringBuilder();
 
-            var lastTime = sortedList.ElementAt(0).UserAccount.localTime;
+            var lastTime = sortedList.ElementAt(0).Time;
             foreach (var item in sortedList)
             {
-                var text = $"{item.User.Nickname ?? item.User.Username} - {Utilities.GetTime(item.UserAccount.localTime)}";
+                var text = $"{item.User.Nickname ?? item.User.Username} - {TimeZones.GetTimeByTimeZone(item.UserAccount.timeZoneId)}";
 
-                if (lastTime != item.UserAccount.localTime)
+                if (lastTime != item.Time)
                 {
-                    lastTime = item.UserAccount.localTime;
+                    lastTime = item.Time;
                     text = $"\n{text}";
                 }
 
@@ -119,11 +116,12 @@ namespace TimeBot.Interactions
                 foreach (var User in List)
                 {
                     var account = UserAccounts.GetAccount(User.Id);
-                    if (!User.IsBot && account.country != "Not set.")
+                    if (!User.IsBot && account.country != "Not set." && account.timeZoneId != "Not set.")
                         validAccounts.Add(new ListItem
                         {
                             User = User,
-                            UserAccount = account
+                            UserAccount = account,
+                            Time = TimeZones.GetRawTimeByTimeZone(account.timeZoneId)
                         });
                 }
             }
@@ -131,11 +129,11 @@ namespace TimeBot.Interactions
             // Sort them by country name (alphabetical)
             // Then by time (earliest to latest)
             validAccounts = validAccounts.OrderBy(x => x.UserAccount.country)
-                .ThenBy(x => x.UserAccount.localTime)
+                .ThenBy(x => x.Time)
                 .ToList();
 
             // Get a list of all the unique country name
-            var countryNames = (validAccounts.Aggregate("", (current, x) => current + $" {x.UserAccount.country.Replace(" ", "_")}").Split(' ')).ToList();
+            var countryNames = validAccounts.Aggregate("", (current, x) => current + $" {x.UserAccount.country.Replace(" ", "_")}").Split(' ').ToList();
             countryNames = countryNames.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
 
             var fields = new List<EmbedFieldBuilder>();
@@ -153,8 +151,8 @@ namespace TimeBot.Interactions
                             select a;
 
                 fields.Add(new EmbedFieldBuilder()
-                    .WithName($"{actualCountryName} {Utilities.GetCountryFlag(actualCountryName)}")
-                    .WithValue($"{users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {Utilities.GetTime(user.UserAccount.localTime)}\n")}\u200B")
+                    .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)}")
+                    .WithValue($"{users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {TimeZones.GetTimeByTimeZone(user.UserAccount.timeZoneId)}\n")}\u200B")
                     .WithIsInline(false));
             }
 
@@ -192,57 +190,33 @@ namespace TimeBot.Interactions
                 .WithTitle("Time Bot Help")
                 .WithColor(Utilities.Blue)
                 .WithDescription("Hello, I am TimeBot. I can provide the local time and country for other users. Data is saved across all servers.")
-                .AddField("Commands", "`/timesetup` Help on setting up your time (and country if you want)\n`!time` View your time.\n`/time @mentionedUser` View a target's local time.\n`/timeset [number]` Set your local time.\n`/countryset [country name]` Set your country.\n`/timestats` View stats for the bot.")
-                .AddField("Additional Help", "You can ask on GitHub or the support server (https://discord.gg/ga9V5pa) for additional help.\n\nOr add the Developer: Reverse#0069")
+                .AddField("Commands", "`/timesetup` Set up your time\n`/time` View your time.\n`/time @mentionedUser` View a user's local time.\n`/countryset [country name]` Set your country.\n`/timestats` View stats for the bot.\n`/countryall` View everyone's country & time\n`/timeall` View the time for everyone")
+                .AddField("Additional Help", $"You can ask on GitHub or the support server ({Utilities.SupportServer}) for additional help.\n\nOr add the Developer: Reverse#0069")
                 .AddField("GitHub", "https://github.com/WilliamWelsh/TimeBot")
                 .Build());
-
-        // /timeset
-        public static async Task SetTime(this SocketSlashCommand command)
-        {
-            var hourDifference = Convert.ToDouble(command.Data.Options.ElementAt(0).Value.ToString());
-
-            if (hourDifference < -24 || hourDifference > 24)
-            {
-                await command.PrintError("Invalid hour difference. The input must be between -24 and 24. Please run `/timesetup` for more help.");
-                return;
-            }
-
-            var minuteDifference = (int)((decimal)hourDifference % 1 * 100);
-            if (minuteDifference != 50 && minuteDifference != 0 && minuteDifference != -50)
-            {
-                await command.PrintError("Invalid minute difference. The minute offset can only be 0 or 0.5, such as 1.5 or 5.5. Please run `/timesetup` for more help.");
-                return;
-            }
-
-            var account = UserAccounts.GetAccount(command.User.Id);
-            account.localTime = hourDifference;
-            UserAccounts.SaveAccounts();
-
-            await command.RespondAsync(embed: new EmbedBuilder()
-                .WithTitle("Success")
-                .WithDescription($"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser)command.User).Nickname ?? command.User.Username)}\n\nIf the time is wrong, try again. Type `/timesetup` for more help.")
-                .WithColor(Utilities.Green)
-                .Build());
-        }
 
         // /countryset
         public static async Task SetCountry(this SocketSlashCommand command)
         {
             var country = command.Data.Options.ElementAt(0).Value.ToString();
 
-            if (!StatsHandler.Countries.Contains(country, StringComparer.CurrentCultureIgnoreCase))
+            if (!Countries.List.Contains(country, StringComparer.CurrentCultureIgnoreCase))
             {
-                await command.PrintError("Country not valid. Please try again.\n\nExamples:\n`/countryset united states`\n`/country set united kingdom`\n`/country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt");
+                await command.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription(
+                        "Country not valid. Please try again.\n\nExamples:\n`/countryset united states`\n`/country set united kingdom`\n`/country set canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/TimeBot/countries.txt")
+                    .WithColor(Utilities.Red)
+                    .Build());
                 return;
             }
 
             // Find the country input and set it to the capitlized version
-            var index = StatsHandler.Countries.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
+            var index = Countries.List.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
 
             // Save the target's country
             var account = UserAccounts.GetAccount(command.User.Id);
-            account.country = StatsHandler.Countries.ElementAt(index);
+            account.country = Countries.List.ElementAt(index);
             UserAccounts.SaveAccounts();
 
             await command.RespondAsync(embed: new EmbedBuilder()
@@ -270,12 +244,64 @@ namespace TimeBot.Interactions
                 .Build()).ConfigureAwait(false);
         }
 
-        // Send an error message
-        public static async Task PrintError(this SocketSlashCommand command, string description) =>
-            await command.RespondAsync(embed: new EmbedBuilder()
-                .WithTitle("Error")
-                .WithDescription(description)
-                .WithColor(Utilities.Red)
-                .Build());
+        // /timesetup
+        public static async Task TimeSetup(this SocketInteraction interaction)
+        {
+            var embed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithDescription($"Please select your timezone 😀\n\nIf you need help please join the Support Server: {Utilities.SupportServer}")
+                .Build();
+
+            if (interaction is SocketSlashCommand slashCommand)
+            {
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, interaction.User), ephemeral: true);
+            }
+            else if (interaction is SocketMessageComponent buttonCommand)
+            {
+                var args = buttonCommand.Data.CustomId.Split("-");
+
+                // Previous and Next Page buttons
+                if (buttonCommand.Data.CustomId.StartsWith("lastpage"))
+                {
+                    await buttonCommand.UpdateAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User);
+                    });
+                }
+                else if(buttonCommand.Data.CustomId.StartsWith("nextpage"))
+                {
+                    try
+                    {
+                        await buttonCommand.UpdateAsync(x =>
+                        {
+                            x.Embed = embed;
+                            x.Components =
+                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, interaction.User);
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                // Clicked a timezone button
+                var account = UserAccounts.GetAccount(ulong.Parse(args[1]));
+                account.timeZoneId = args[2];
+                UserAccounts.SaveAccounts();
+
+                await buttonCommand.UpdateAsync(x =>
+                {
+                    x.Embed = new EmbedBuilder()
+                        .WithTitle("Success")
+                        .WithDescription(
+                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser) buttonCommand.User).Nickname ?? buttonCommand.User.Username)}\n\nIf the time is wrong, try again. Do `/timesetup` again.")
+                        .WithColor(Utilities.Green)
+                        .Build();
+                    x.Components = null;
+                });
+            }
+        }
     }
 }

@@ -52,9 +52,6 @@ namespace TimeBot
             await EventHandler.InitializeAsync(_client, _restClient);
             await _client.SetGameAsync("/timehelp");
 
-            // Set up the list of valid countries
-            StatsHandler.SetupCountryList();
-
             await Task.Delay(-1).ConfigureAwait(false);
         }
 

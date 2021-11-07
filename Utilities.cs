@@ -1,9 +1,7 @@
 ﻿using System;
-using Discord;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using Discord.WebSocket;
 using Color = Discord.Color;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp.PixelFormats;
@@ -14,36 +12,17 @@ namespace TimeBot
     {
         // Common Colors used
 
-        public static readonly Color Blue = new Color(127, 166, 208);
-        public static readonly Color Red = new Color(231, 76, 60);
-        public static readonly Color Green = new Color(31, 139, 76);
+        public static readonly Color Blue = new(127, 166, 208);
+        public static readonly Color Red = new(231, 76, 60);
+        public static readonly Color Green = new(31, 139, 76);
+
+        /// <summary>
+        /// Invite link to the support server
+        /// </summary>
+        public static string SupportServer = "https://discord.gg/ga9V5pa";
 
         // Http Client
-        public static HttpClient HttpClient = new HttpClient();
-
-        /// <summary>
-        /// Return an embed field
-        /// </summary>
-        public static EmbedFieldBuilder MakeEmbedField(string name, string value) => new EmbedFieldBuilder().WithName(name).WithValue(value).WithIsInline(false);
-
-        /// <summary>
-        /// Print a red error message.
-        /// </summary>
-        public static async Task PrintError(this ISocketMessageChannel channel, string message) => await channel.PrintEmbed("Error", message, Red).ConfigureAwait(false);
-
-        /// <summary>
-        /// Print a green success message.
-        /// </summary>
-        public static async Task PrintSuccess(this ISocketMessageChannel channel, string message) => await channel.PrintEmbed("Success", message, Green).ConfigureAwait(false);
-
-        /// <summary>
-        /// Print a basic embed.
-        /// </summary>
-        public static async Task PrintEmbed(this ISocketMessageChannel channel, string title, string message, Color color) => await channel.SendMessageAsync("", false, new EmbedBuilder()
-                .WithTitle(title)
-                .WithColor(color)
-                .WithDescription(message)
-                .Build());
+        public static HttpClient HttpClient = new();
 
         /// <summary>
         /// Get the average color for a user's profile picture
@@ -54,155 +33,6 @@ namespace TimeBot
             {
                 var palette = DominantColorFinder.GetPalette((SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms));
                 return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
-            }
-        }
-
-        public static async Task<string> GetUserColorForSlash(string avatarURL)
-        {
-            var palette = DominantColorFinder.GetPalette(await DownloadImage(avatarURL));
-            var color = new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
-            return Convert.ToInt32($"{color.R:X2}{color.G:X2}{color.B:X2}", 16).ToString();
-        }
-
-        public static async Task<SixLabors.ImageSharp.Image<Rgba32>> DownloadImage(string URL)
-        {
-            using (var ms = new MemoryStream(await HttpClient.GetByteArrayAsync(URL)))
-                return (SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms);
-        }
-
-        /// <summary>
-        /// Format a time into h:mm tt
-        /// </summary>
-        /// <param name="offset">The amount of hours to add to the current time.</param>
-        /// <returns></returns>
-        public static string GetTime(double offset) => DateTime.Now.AddHours(offset).ToString("h:mm tt");
-
-        /// <summary>
-        /// Get the emoji for a country
-        /// </summary>
-        public static string GetCountryFlag(string country)
-        {
-            switch (country)
-            {
-                case "Australia":
-                    return "🇦🇺";
-
-                case "Canada":
-                    return "🇨🇦";
-
-                case "China":
-                    return "🇨🇳";
-
-                case "Djibouti":
-                    return "🇩🇯";
-
-                case "Latvia":
-                    return "🇱🇻";
-
-                case "Germany":
-                    return "🇩🇪";
-
-                case "France":
-                    return "🇫🇷";
-
-                case "Poland":
-                    return "🇵🇱";
-
-                case "Mexico":
-                    return "🇲🇽";
-
-                case "Turkey":
-                    return "🇹🇷";
-
-                case "Uruguay":
-                    return "🇺🇾";
-
-                case "Philippines":
-                    return "🇵🇭";
-
-                case "Denmark":
-                    return "🇩🇰";
-
-                case "Netherlands":
-                    return "🇳🇱";
-
-                case "Scotland":
-                    return "🏴󠁧󠁢󠁳󠁣󠁴󠁿";
-
-                case "Sweden":
-                    return "🇸🇪";
-
-                case "United Kingdom":
-                    return "🇬🇧";
-
-                case "United States":
-                    return "🇺🇸";
-
-                case "Bangladesh":
-                    return "🇧🇩";
-
-                case "Ethiopia":
-                    return "🇪🇹";
-
-                case "India":
-                    return "🇮🇳";
-
-                case "Indonesia":
-                    return "🇮🇩";
-
-                case "Lebanon":
-                    return "🇱🇧";
-
-                case "Morocco":
-                    return "🇲🇦";
-
-                case "Norway":
-                    return "🇳🇴";
-
-                case "Pakistan":
-                    return "🇵🇰";
-
-                case "Ukraine":
-                    return "🇺🇦";
-
-                case "Singapore":
-                    return "🇸🇬";
-
-                case "Ireland":
-                    return "🇮🇪";
-
-                case "Dominica":
-                    return "🇩🇲";
-
-                case "Malaysia":
-                    return "🇲🇾";
-
-                case "Nepal":
-                    return "🇳🇵";
-
-                case "Hong Kong":
-                    return "🇭🇰";
-
-                case "Vietnam":
-                    return "🇻🇳";
-
-                case "Nigeria":
-                    return "🇳🇬";
-
-                case "Belgium":
-                    return "🇧🇪";
-
-                case "Ghana":
-                    return "🇬🇭";
-
-                case "Jamaica":
-                    return "🇯🇲";
-
-                case "Jordan":
-                    return "🇯🇴";
-
-                default:
-                    return "";
             }
         }
     }

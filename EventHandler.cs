@@ -42,17 +42,18 @@ namespace TimeBot
 
                 // User Commands (context menu)
                 case SocketUserCommand userCommand:
-                    var user = (SocketGuildUser) userCommand.Data.Member;
-                    await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+                    var user = (SocketGuildUser)userCommand.Data.Member;
+                    await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(
+                        UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username,
+                        user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
                     break;
 
                 // Button
                 case SocketMessageComponent buttonCommand:
                     if (buttonCommand.Data.CustomId == "refresh-country")
                         await buttonCommand.ShowCountryForAll();
-                    break;
-
-                default:
+                    else
+                        await buttonCommand.TimeSetup();
                     break;
             }
         }
@@ -69,13 +70,12 @@ namespace TimeBot
 
             var context = new SocketCommandContext(_socketClient, msg);
 
-            // Uncommented while testing (my private test server)
-            //if (context.Guild.Id != 735263201612005472)
-            //    return;
-
-            int argPos = 0;
-            if (msg.HasStringPrefix("!", ref argPos))
-                await _service.ExecuteAsync(context, argPos, null);
+            if (msg.Content.ToLower().StartsWith("!time") || msg.Content.Contains("<@529569000028373002>"))
+            {
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    .WithDescription($"Per Discord requirements, this bot is now 100% interaction based (slash commands, buttons, etc.). Do `/timehelp` for more help. If this bot does not have slash commands enabled on this server, please ask an administrator to re-invite the bot using this link:\n\nhttps://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands\n\nSupport Server: {Utilities.SupportServer}")
+                    .Build());
+            }
         }
     }
 }

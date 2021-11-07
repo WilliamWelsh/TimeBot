@@ -39,7 +39,7 @@ namespace TimeBot.UserData
             var newAccount = new UserAccount
             {
                 userID = id,
-                localTime = 999,
+                timeZoneId = "Not set.",
                 country = "Not set.",
             };
             accounts.Add(newAccount);
