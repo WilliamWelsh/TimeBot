@@ -79,7 +79,6 @@ namespace TimeBot
             "South Africa Standard Time",
             "FLE Standard Time",
             "Israel Standard Time",
-            "South Sudan Standard Time",
             "Kaliningrad Standard Time",
             "Sudan Standard Time",
             "Libya Standard Time",
@@ -153,7 +152,7 @@ namespace TimeBot
             "UTC+13",
             "Tonga Standard Time",
             "Samoa Standard Time",
-            //"Line Islands Standard Time"
+            "Line Islands Standard Time"
         };
 
         /// <summary>
