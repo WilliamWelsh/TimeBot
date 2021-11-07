@@ -110,9 +110,9 @@ namespace TimeBot.Interactions
         }
 
         // /countryall
-        public static async Task ShowCountryForAll(this SocketSlashCommand command)
+        public static async Task ShowCountryForAll(this SocketInteraction interaction)
         {
-            var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
+            var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)interaction.User).Guild.Id)).GetUsersAsync();
             var validAccounts = new List<ListItem>();
             await foreach (var List in Users)
             {
@@ -158,11 +158,32 @@ namespace TimeBot.Interactions
                     .WithIsInline(false));
             }
 
-            await command.RespondAsync(embed: new EmbedBuilder()
-                .WithColor(Utilities.Blue)
-                .WithTitle("Everyone's Time by Country")
-                .WithFields(fields)
-                .Build());
+            switch (interaction)
+            {
+                case SocketSlashCommand command:
+                    await command.RespondAsync(embed: new EmbedBuilder()
+                            .WithColor(Utilities.Blue)
+                            .WithTitle("Everyone's Time by Country")
+                            .WithFields(fields)
+                            .Build(),
+                        component: new ComponentBuilder()
+                            .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
+                            .Build());
+                    break;
+
+                case SocketMessageComponent button:
+                    await button.UpdateAsync(x => {
+                        x.Embed = new EmbedBuilder()
+                            .WithColor(Utilities.Blue)
+                            .WithTitle("Everyone's Time by Country")
+                            .WithFields(fields)
+                            .Build();
+                        x.Components = new ComponentBuilder()
+                            .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
+                            .Build();
+                    });
+                    break;
+            }
         }
 
         // /timehelp

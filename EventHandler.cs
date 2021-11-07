@@ -46,6 +46,12 @@ namespace TimeBot
                     await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
                     break;
 
+                // Button
+                case SocketMessageComponent buttonCommand:
+                    if (buttonCommand.Data.CustomId == "refresh-country")
+                        await buttonCommand.ShowCountryForAll();
+                    break;
+
                 default:
                     break;
             }
