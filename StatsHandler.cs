@@ -217,14 +217,14 @@ namespace TimeBot
             // Get a list of valid accounts
             // Valid account: A user that isn't a bot and has their country set up
             var Users = (await EventHandler._restClient.GetGuildAsync(Context.Guild.Id)).GetUsersAsync();
-            var validAccounts = new List<CountryListItem>();
+            var validAccounts = new List<ListItem>();
             await foreach (var List in Users)
             {
                 foreach (var User in List)
                 {
                     var account = UserAccounts.GetAccount(User.Id);
                     if (!User.IsBot && account.country != "Not set.")
-                        validAccounts.Add(new CountryListItem
+                        validAccounts.Add(new ListItem
                         {
                             User = User,
                             UserAccount = account

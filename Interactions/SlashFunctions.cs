@@ -56,25 +56,43 @@ namespace TimeBot.Interactions
         public static async Task ShowTimeForAll(this SocketSlashCommand command)
         {
             var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
-            var firstLine = new StringBuilder();
-            var secondLIne = new StringBuilder();
+            var validAccounts = new List<ListItem>();
+
             await foreach (var List in Users)
             {
                 foreach (var User in List)
                 {
-                    if (User.IsBot) continue;
-
                     var account = UserAccounts.GetAccount(User.Id);
-
-                    var text = account.localTime == 999
-                        ? $"{User.Nickname ?? User.Username} - No Time Set"
-                        : $"{User.Nickname ?? User.Username} - {Utilities.GetTime(account.localTime)}";
-
-                    if (firstLine.ToString().Length < 1800)
-                        firstLine.AppendLine(text);
-                    else
-                        secondLIne.AppendLine(text);
+                    if (!User.IsBot && account.localTime != 999)
+                        validAccounts.Add(new ListItem
+                        {
+                            User = User,
+                            UserAccount = account
+                        });
                 }
+            }
+
+            // Sort by earliest time to latest
+            var sortedList = validAccounts.OrderBy(u => u.UserAccount.localTime);
+
+            var firstLine = new StringBuilder();
+            var secondLIne = new StringBuilder();
+
+            var lastTime = sortedList.ElementAt(0).UserAccount.localTime;
+            foreach (var item in sortedList)
+            {
+                var text = $"{item.User.Nickname ?? item.User.Username} - {Utilities.GetTime(item.UserAccount.localTime)}";
+
+                if (lastTime != item.UserAccount.localTime)
+                {
+                    lastTime = item.UserAccount.localTime;
+                    text = $"\n{text}";
+                }
+
+                if (firstLine.ToString().Length < 1800)
+                    firstLine.AppendLine(text);
+                else
+                    secondLIne.AppendLine(text);
             }
 
             await command.RespondAsync(embed: new EmbedBuilder()
@@ -95,14 +113,14 @@ namespace TimeBot.Interactions
         public static async Task ShowCountryForAll(this SocketSlashCommand command)
         {
             var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
-            var validAccounts = new List<CountryListItem>();
+            var validAccounts = new List<ListItem>();
             await foreach (var List in Users)
             {
                 foreach (var User in List)
                 {
                     var account = UserAccounts.GetAccount(User.Id);
                     if (!User.IsBot && account.country != "Not set.")
-                        validAccounts.Add(new CountryListItem
+                        validAccounts.Add(new ListItem
                         {
                             User = User,
                             UserAccount = account
