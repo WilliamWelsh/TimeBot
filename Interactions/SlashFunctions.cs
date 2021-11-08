@@ -202,14 +202,14 @@ namespace TimeBot.Interactions
         {
             var country = command.Data.Options.ElementAt(0).Value.ToString();
 
+            // Check if it's a valid country name
             if (!Countries.List.Contains(country, StringComparer.CurrentCultureIgnoreCase))
             {
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
-                    .WithDescription(
-                        "Country not valid. Please try again.\n\nExamples:\n`/countryset united states`\n`/countryset united kingdom`\n`/countryset canada`\n\nList of valid countries: https://raw.githubusercontent.com/WilliamWelsh/TimeBot/master/countries.txt")
+                    .WithDescription("That is not a valid country name, please try again.\n\nExamples:\n`/countryset united states`\n`/countryset united kingdom`\n`/countryset canada`\n\nYou can find a list of valid countries here: https://github.com/WilliamWelsh/TimeBot/blob/master/countries.txt")
                     .WithColor(Utilities.Red)
-                    .Build());
+                    .Build(), ephemeral: true);
                 return;
             }
 
@@ -221,11 +221,12 @@ namespace TimeBot.Interactions
             account.country = Countries.List.ElementAt(index);
             UserAccounts.SaveAccounts();
 
+            // Send them the result
             await command.RespondAsync(embed: new EmbedBuilder()
                 .WithTitle("Success")
                 .WithDescription($"You have successfully set your country to {account.country}.\n\nIf this is an error, you can run `/countryset [country name]` again.")
                 .WithColor(Utilities.Green)
-                .Build());
+                .Build(), ephemeral: true);
         }
 
         // /timestats
