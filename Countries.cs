@@ -330,6 +330,9 @@ namespace TimeBot
                 case "Jordan":
                     return "🇯🇴";
 
+                case "Barbados":
+                    return "🇧🇧";
+
                 default:
                     return "";
             }
