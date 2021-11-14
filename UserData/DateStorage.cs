@@ -9,7 +9,7 @@ namespace TimeBot.UserData
         // Save user accounts
         public static void SaveUserAccounts(IEnumerable<UserAccount> accounts, string filePath)
         {
-            var json = JsonConvert.SerializeObject(accounts, Formatting.Indented);
+            var json = JsonConvert.SerializeObject(accounts, Formatting.None);
             File.WriteAllText(filePath, json);
         }
 
