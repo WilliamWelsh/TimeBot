@@ -172,7 +172,8 @@ namespace TimeBot.Interactions
                     break;
 
                 case SocketMessageComponent button:
-                    await button.UpdateAsync(x => {
+                    await button.UpdateAsync(x =>
+                    {
                         x.Embed = new EmbedBuilder()
                             .WithColor(Utilities.Blue)
                             .WithTitle("Everyone's Time by Country")
@@ -272,7 +273,7 @@ namespace TimeBot.Interactions
                         x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User);
                     });
                 }
-                else if(buttonCommand.Data.CustomId.StartsWith("nextpage"))
+                else if (buttonCommand.Data.CustomId.StartsWith("nextpage"))
                 {
                     try
                     {
@@ -299,12 +300,58 @@ namespace TimeBot.Interactions
                     x.Embed = new EmbedBuilder()
                         .WithTitle("Success")
                         .WithDescription(
-                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser) buttonCommand.User).Nickname ?? buttonCommand.User.Username)}\n\nIf the time is wrong, try again. Do `/timesetup` again.")
+                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser)buttonCommand.User).Nickname ?? buttonCommand.User.Username)}\n\nIf the time is wrong, try again. Do `/timesetup` again.")
                         .WithColor(Utilities.Green)
                         .Build();
                     x.Components = null;
                 });
             }
+        }
+
+        // Set a user's country
+        public static async Task SetUserCountry(this SocketSlashCommand command)
+        {
+            // Check if they're an admin
+            if (!((SocketGuildUser)command.User).GuildPermissions.Administrator)
+            {
+                await command.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription("You do not have permission to use this command.")
+                    .WithColor(Utilities.Red)
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            // Get the account of the user
+            var target = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id);
+
+            var country = command.Data.Options.ElementAt(1).Value.ToString();
+
+            // Check if it's a valid country name
+            if (!Countries.List.Contains(country, StringComparer.CurrentCultureIgnoreCase))
+            {
+                await command.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription("That is not a valid country name, please try again.\n\nExamples:\n`/countryset united states`\n`/countryset united kingdom`\n`/countryset canada`\n\nYou can find a list of valid countries here: https://github.com/WilliamWelsh/TimeBot/blob/master/countries.txt")
+                    .WithColor(Utilities.Red)
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            // Find the country input and set it to the capitlized version
+            var index = Countries.List.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
+
+            // Save the target's country
+            var account = UserAccounts.GetAccount(target.Id);
+            account.country = Countries.List.ElementAt(index);
+            UserAccounts.SaveAccounts();
+
+            // Send them the result
+            await command.RespondAsync(embed: new EmbedBuilder()
+                .WithTitle("Success")
+                .WithDescription($"You have successfully {target.Mention}'s country to {account.country}.\n\nIf this is an error, you can run `/user-country-set [country name]` again.")
+                .WithColor(Utilities.Green)
+                .Build(), ephemeral: true);
         }
     }
 }

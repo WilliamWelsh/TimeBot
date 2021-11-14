@@ -14,7 +14,7 @@ namespace TimeBot.Interactions
             {
                 case "time":
                     if (command.Data.Options == null)
-                        await command.ShowTime((SocketGuildUser) command.User);
+                        await command.ShowTime((SocketGuildUser)command.User);
                     else
                         await command.ShowTime(await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
@@ -31,7 +31,7 @@ namespace TimeBot.Interactions
                     break;
 
                 case "countryall":
-                        await command.ShowCountryForAll();
+                    await command.ShowCountryForAll();
                     break;
 
                 case "timehelp":
@@ -48,6 +48,10 @@ namespace TimeBot.Interactions
 
                 case "timesetup":
                     await command.TimeSetup();
+                    break;
+
+                case "set-user-country":
+                    await command.SetUserCountry();
                     break;
 
                 default:
