@@ -118,7 +118,7 @@ namespace TimeBot.Interactions
                 foreach (var User in List)
                 {
                     var account = UserAccounts.GetAccount(User.Id);
-                    if (!User.IsBot && account.country != "Not set." && account.timeZoneId != "Not set.")
+                    if (!User.IsBot && account.country != "Not set.")
                         validAccounts.Add(new ListItem
                         {
                             User = User,
