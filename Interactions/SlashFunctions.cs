@@ -138,7 +138,8 @@ namespace TimeBot.Interactions
             var countryNames = validAccounts.Aggregate("", (current, x) => current + $" {x.UserAccount.country.Replace(" ", "_")}").Split(' ').ToList();
             countryNames = countryNames.Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToList();
 
-            var fields = new List<EmbedFieldBuilder>();
+            var firstFieldList = new List<EmbedFieldBuilder>();
+            var secondFieldList = new List<EmbedFieldBuilder>();
 
             for (int i = 0; i < countryNames.Count; i++)
             {
@@ -152,37 +153,79 @@ namespace TimeBot.Interactions
                             where a.UserAccount.country == actualCountryName
                             select a;
 
-                fields.Add(new EmbedFieldBuilder()
+                if (firstFieldList.Count < 25)
+                {
+                    firstFieldList.Add(new EmbedFieldBuilder()
                     .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)}")
                     .WithValue($"{users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {TimeZones.GetTimeByTimeZone(user.UserAccount.timeZoneId)}\n")}\u200B")
                     .WithIsInline(false));
+                }
+                else
+                {
+                    secondFieldList.Add(new EmbedFieldBuilder()
+                    .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)}")
+                    .WithValue($"{users.Aggregate("", (current, user) => current + $"{user.User.Nickname ?? user.User.Username} - {TimeZones.GetTimeByTimeZone(user.UserAccount.timeZoneId)}\n")}\u200B")
+                    .WithIsInline(false));
+                }
             }
+
+            var firstEmbed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithTitle("Everyone's Time by Country")
+                .WithFields(firstFieldList)
+                .Build();
+
+            var secondEmbed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithTitle("Everyone's Time by Country")
+                .WithFields(secondFieldList)
+                .Build();
+
+            var regularRefreshButton = new ComponentBuilder()
+                .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
+                .Build();
 
             switch (interaction)
             {
                 case SocketSlashCommand command:
-                    await command.RespondAsync(embed: new EmbedBuilder()
-                            .WithColor(Utilities.Blue)
-                            .WithTitle("Everyone's Time by Country")
-                            .WithFields(fields)
-                            .Build(),
+                    if (secondFieldList.Count == 0)
+                    {
+                        await command.RespondAsync(embed: firstEmbed,
+                        component: regularRefreshButton);
+                    }
+                    else
+                    {
+
+                        await command.RespondAsync("You have so many members that it couldn't fit in one message, so I sent two 😀", ephemeral: true);
+                        var firstMessage = await command.Channel.SendMessageAsync(embed: firstEmbed);
+                        await command.Channel.SendMessageAsync(embed: secondEmbed,
                         component: new ComponentBuilder()
-                            .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
+                            .WithButton("Refresh", $"refresh-country-{firstMessage.Id}", ButtonStyle.Secondary)
                             .Build());
+                    }
                     break;
 
                 case SocketMessageComponent button:
-                    await button.UpdateAsync(x =>
+                    var data = button.Data.CustomId.Split("-");
+                    // 3 data meaans we have a first message id
+                    if (data.Count() == 3)
                     {
-                        x.Embed = new EmbedBuilder()
-                            .WithColor(Utilities.Blue)
-                            .WithTitle("Everyone's Time by Country")
-                            .WithFields(fields)
-                            .Build();
-                        x.Components = new ComponentBuilder()
-                            .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
-                            .Build();
-                    });
+                        var message = (RestUserMessage)await button.Channel.GetMessageAsync(Convert.ToUInt64(data[2]));
+                        await message.ModifyAsync(x => x.Embed = firstEmbed);
+                        await button.UpdateAsync(x =>
+                        {
+                            x.Embed = secondEmbed;
+                            x.Components = regularRefreshButton;
+                        });
+                    }
+                    else
+                    {
+                        await button.UpdateAsync(x =>
+                        {
+                            x.Embed = firstEmbed;
+                            x.Components = regularRefreshButton;
+                        });
+                    }
                     break;
             }
         }
