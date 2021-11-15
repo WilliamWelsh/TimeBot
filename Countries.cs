@@ -332,9 +332,12 @@ namespace TimeBot
 
                 case "Barbados":
                     return "🇧🇧";
-                    
+
                 case "Serbia":
                     return "🇷🇸";
+
+                case "Russia":
+                    return "🇷🇺";
 
                 default:
                     return "";
