@@ -1,2 +1,2 @@
-dotnet publish -p:PublishProfile=Properties\PublishProfiles\FolderProfile.pubxml -c Release
+dotnet publish -p:PublishProfile=Properties/PublishProfiles/FolderProfile.pubxml -c Release
 pause
