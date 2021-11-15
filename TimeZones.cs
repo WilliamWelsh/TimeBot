@@ -165,7 +165,7 @@ namespace TimeBot
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public static DateTime GetRawTimeByTimeZone(string Id) => TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, Id);
+        public static DateTime GetRawTimeByTimeZone(string Id) => Id == "Not set." ? new DateTime(1970, 1, 1) : TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, Id);
 
         /// <summary>
         /// Get buttons of TimeZones
