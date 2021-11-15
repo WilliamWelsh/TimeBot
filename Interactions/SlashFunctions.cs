@@ -301,7 +301,7 @@ namespace TimeBot.Interactions
 
             if (interaction is SocketSlashCommand slashCommand)
             {
-                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, interaction.User), ephemeral: true);
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, interaction.User.Id), ephemeral: true);
             }
             else if (interaction is SocketMessageComponent buttonCommand)
             {
@@ -313,7 +313,7 @@ namespace TimeBot.Interactions
                     await buttonCommand.UpdateAsync(x =>
                     {
                         x.Embed = embed;
-                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User);
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User.Id);
                     });
                 }
                 else if (buttonCommand.Data.CustomId.StartsWith("nextpage"))
@@ -324,7 +324,7 @@ namespace TimeBot.Interactions
                         {
                             x.Embed = embed;
                             x.Components =
-                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, interaction.User);
+                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, interaction.User.Id);
                         });
                     }
                     catch (Exception e)
@@ -395,6 +395,79 @@ namespace TimeBot.Interactions
                 .WithDescription($"You have successfully {target.Mention}'s country to {account.country}.\n\nIf this is an error, you can run `/user-country-set [country name]` again.")
                 .WithColor(Utilities.Green)
                 .Build(), ephemeral: true);
+        }
+
+        // Set a user's time
+        public static async Task SetUserTime(this SocketInteraction interaction)
+        {
+            /// Check if they're an admin
+            if (!((SocketGuildUser)interaction.User).GuildPermissions.Administrator)
+            {
+                await interaction.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription("You do not have permission to use this command.")
+                    .WithColor(Utilities.Red)
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            var embed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithDescription($"Please select the timezone 😀\n\nIf you need help please join the Support Server: {Utilities.SupportServer}")
+                .Build();
+
+            if (interaction is SocketSlashCommand slashCommand)
+            {
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)slashCommand.Data.Options.ElementAt(0).Value).Id), ephemeral: true);
+            }
+            else if (interaction is SocketMessageComponent buttonCommand)
+            {
+                var args = buttonCommand.Data.CustomId.Split("-");
+
+                var target = args[2];
+
+                // Previous and Next Page buttons
+                if (buttonCommand.Data.CustomId.StartsWith("lastpage"))
+                {
+                    await buttonCommand.UpdateAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, Convert.ToUInt64(target));
+                    });
+                }
+                else if (buttonCommand.Data.CustomId.StartsWith("nextpage"))
+                {
+                    try
+                    {
+                        await buttonCommand.UpdateAsync(x =>
+                        {
+                            x.Embed = embed;
+                            x.Components =
+                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, Convert.ToUInt64(target));
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                }
+
+                // Clicked a timezone button
+                var account = UserAccounts.GetAccount(ulong.Parse(args[1]));
+                account.timeZoneId = args[2];
+                UserAccounts.SaveAccounts();
+
+                await buttonCommand.UpdateAsync(x =>
+                {
+                    x.Embed = new EmbedBuilder()
+                        .WithTitle("Success")
+                        .WithDescription(
+                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser)buttonCommand.User).Nickname ?? buttonCommand.User.Username)}\n\nIf the time is wrong, try again. Do `/timesetup` again.")
+                        .WithColor(Utilities.Green)
+                        .Build();
+                    x.Components = null;
+                });
+            }
         }
     }
 }

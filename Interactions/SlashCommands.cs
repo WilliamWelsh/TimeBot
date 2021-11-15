@@ -54,6 +54,10 @@ namespace TimeBot.Interactions
                     await command.SetUserCountry();
                     break;
 
+                case "set-user-time":
+                    await command.SetUserTime();
+                    break;
+
                 default:
                     break;
             }
