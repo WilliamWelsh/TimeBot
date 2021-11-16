@@ -143,6 +143,7 @@ namespace TimeBot.Interactions
 
                 var firstFieldList = new List<EmbedFieldBuilder>();
                 var secondFieldList = new List<EmbedFieldBuilder>();
+                var totalCountries = 0;
 
                 for (int i = 0; i < countryNames.Count; i++)
                 {
@@ -174,6 +175,8 @@ namespace TimeBot.Interactions
                             .WithValue(description)
                             .WithIsInline(false));
 
+                        totalCountries++;
+
                         if (descriptionTwo != "")
                         {
                             firstFieldList.Add(new EmbedFieldBuilder()
@@ -189,6 +192,8 @@ namespace TimeBot.Interactions
                             .WithValue(description)
                             .WithIsInline(false));
 
+                        totalCountries++;
+
                         if (descriptionTwo != "")
                         {
                             secondFieldList.Add(new EmbedFieldBuilder()
@@ -201,13 +206,13 @@ namespace TimeBot.Interactions
 
                 var firstEmbed = new EmbedBuilder()
                     .WithColor(Utilities.Blue)
-                    .WithTitle($"Everyone's Time by Country ({firstFieldList.Count})")
+                    .WithTitle($"Everyone's Time by Country ({totalCountries})")
                     .WithFields(firstFieldList)
                     .Build();
 
                 var secondEmbed = new EmbedBuilder()
                     .WithColor(Utilities.Blue)
-                    .WithTitle($"Everyone's Time by Country ({firstFieldList.Count})")
+                    .WithTitle($"Everyone's Time by Country ({totalCountries})")
                     .WithFields(secondFieldList)
                     .Build();
 
