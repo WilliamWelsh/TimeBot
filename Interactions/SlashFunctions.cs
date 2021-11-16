@@ -132,6 +132,7 @@ namespace TimeBot.Interactions
             // Then by time (earliest to latest)
             validAccounts = validAccounts.OrderBy(x => x.UserAccount.country)
                 .ThenBy(x => x.Time)
+                .ThenBy(x => x.User.Nickname ?? x.User.Username)
                 .ToList();
 
             // Get a list of all the unique country name
