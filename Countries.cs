@@ -339,6 +339,9 @@ namespace TimeBot
                 case "Russia":
                     return "🇷🇺";
 
+                case "Cambodia":
+                    return "🇰🇭";
+
                 default:
                     return "";
             }
