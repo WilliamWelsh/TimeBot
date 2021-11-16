@@ -209,6 +209,7 @@ namespace TimeBot.Interactions
                 case SocketMessageComponent button:
                     var data = button.Data.CustomId.Split("-");
                     // 3 data meaans we have a first message id
+                    Console.WriteLine(data.Count());
                     if (data.Count() == 3)
                     {
                         var message = (RestUserMessage)await button.Channel.GetMessageAsync(Convert.ToUInt64(data[2]));
@@ -216,7 +217,9 @@ namespace TimeBot.Interactions
                         await button.UpdateAsync(x =>
                         {
                             x.Embed = secondEmbed;
-                            x.Components = regularRefreshButton;
+                            x.Components = new ComponentBuilder()
+                            .WithButton("Refresh", $"refresh-country-{data[2]}", ButtonStyle.Secondary)
+                            .Build();
                         });
                     }
                     else
