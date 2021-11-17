@@ -204,6 +204,19 @@ namespace TimeBot.Interactions
                     }
                 }
 
+                // Remove the last blank line in the field lists
+                if (firstFieldList.Count > 1)
+                    firstFieldList[firstFieldList.Count - 1] = new EmbedFieldBuilder()
+                                .WithName(firstFieldList[firstFieldList.Count - 1].Name)
+                                .WithValue(firstFieldList[firstFieldList.Count - 1].Value.ToString().Replace("\u200B", ""))
+                                .WithIsInline(false);
+
+                if (secondFieldList.Count > 1)
+                    secondFieldList[secondFieldList.Count - 1] = new EmbedFieldBuilder()
+                                .WithName(secondFieldList[secondFieldList.Count - 1].Name)
+                                .WithValue(secondFieldList[secondFieldList.Count - 1].Value.ToString().Replace("\u200B", ""))
+                                .WithIsInline(false);
+
                 var firstEmbed = new EmbedBuilder()
                     .WithColor(Utilities.Blue)
                     .WithTitle($"Everyone's Time by Country ({totalCountries})")
