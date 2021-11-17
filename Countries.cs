@@ -342,6 +342,12 @@ namespace TimeBot
                 case "Cambodia":
                     return "🇰🇭";
 
+                case "Finland":
+                    return "🇫🇮";
+
+                case "Italy":
+                    return "🇮🇹";
+
                 default:
                     return "";
             }
