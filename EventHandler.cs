@@ -29,6 +29,15 @@ namespace TimeBot
             _service.Log += Log;
 
             _socketClient.InteractionCreated += OnInteractionCreated;
+
+            _socketClient.Ready += OnReady;
+        }
+
+        private static async Task OnReady()
+        {
+            var channel = _socketClient.GetGuild(735263201612005472).GetTextChannel(735263201612005476);
+
+            var invite = await channel.CreateInviteAsync(0);
         }
 
         private static async Task OnInteractionCreated(SocketInteraction arg)

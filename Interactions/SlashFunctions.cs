@@ -344,7 +344,7 @@ namespace TimeBot.Interactions
                 .AddField("Members", totalMembers.ToString("#,##0"))
                 .AddField("Developer", "Reverse#0069")
                 .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
-                .AddField("Links", "[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server](https://discord.gg/ga9V5pa)")
+                .AddField("Links", $"[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server]({Utilities.SupportServer})")
                 .Build()).ConfigureAwait(false);
         }
 

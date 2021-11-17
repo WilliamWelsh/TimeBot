@@ -19,7 +19,7 @@ namespace TimeBot
         /// <summary>
         /// Invite link to the support server
         /// </summary>
-        public static string SupportServer = "https://discord.gg/ga9V5pa";
+        public static string SupportServer = "https://discord.gg/FjgCFYRZAw";
 
         // Http Client
         public static HttpClient HttpClient = new();
