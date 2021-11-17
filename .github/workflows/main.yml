@@ -1,17 +1,19 @@
 name: Discord
-on: [ push ]
+on: [push]
 jobs:
   Post-To-Discord:
-      name: Discord Notification
-      runs-on: ubuntu-latest
-      steps:
-        - name: Send Commit Message
-          uses: rjstone/discord-webhook-notify@v1.0.4
-          with:
-              severity: info
-              username: TimeBot
-              color: '#7FA6D0'
-              avatarUrl: https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png
-              description: New Commit
-              details: [View online](${{ github.event.head_commit.url }})
-              webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Commit Message
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        with:
+          severity: info
+          username: TimeBot
+          color: "#7FA6D0"
+          avatarUrl: https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png
+          description: This is a custom description.
+          details: "Custom details: Somebody set up us the bomb."
+          footer: This is a footer.
+          text: This is where text goes.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
