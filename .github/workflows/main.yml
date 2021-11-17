@@ -14,5 +14,4 @@ jobs:
               avatarUrl: https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png
               description: New Commit
               details: [View online](${{ github.event.head_commit.url }})
-              footer: ''
               webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
