@@ -12,8 +12,6 @@ jobs:
           username: TimeBot
           color: "#7FA6D0"
           avatarUrl: https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png
-          description: ${{ github.event.head_commit.message }}
-          details: "Custom details: Somebody set up us the bomb."
-          footer: This is a footer.
-          text: This is where text goes.
+          description: **${{ github.event.head_commit.message }}**
+          details: "[View online](${{ github.event.head_commit.url }})"
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
