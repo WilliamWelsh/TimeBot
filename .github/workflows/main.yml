@@ -14,4 +14,6 @@ jobs:
           avatarUrl: https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png
           description: **${{ github.event.head_commit.message }}**
           details: "[View online](${{ github.event.head_commit.url }})"
+          footer: This is a footer.
+          text: This is where text goes.
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
