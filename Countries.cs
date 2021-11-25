@@ -348,6 +348,9 @@ namespace TimeBot
                 case "Italy":
                     return "🇮🇹";
 
+                case "Trinidad and Tobago":
+                    return "🇹🇹";
+
                 default:
                     return "";
             }
