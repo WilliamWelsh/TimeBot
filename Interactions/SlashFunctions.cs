@@ -230,7 +230,7 @@ namespace TimeBot.Interactions
                     .Build();
 
                 var regularRefreshButton = new ComponentBuilder()
-                    .WithButton("Refresh", "refresh-country", ButtonStyle.Secondary)
+                    .WithButton("Refresh", "refresh_country", ButtonStyle.Secondary)
                     .Build();
 
                 switch (interaction)
@@ -248,13 +248,13 @@ namespace TimeBot.Interactions
                             var firstMessage = await command.Channel.SendMessageAsync(embed: firstEmbed);
                             await command.Channel.SendMessageAsync(embed: secondEmbed,
                             component: new ComponentBuilder()
-                                .WithButton("Refresh", $"refresh-country-{firstMessage.Id}", ButtonStyle.Secondary)
+                                .WithButton("Refresh", $"refresh_country_{firstMessage.Id}", ButtonStyle.Secondary)
                                 .Build());
                         }
                         break;
 
                     case SocketMessageComponent button:
-                        var data = button.Data.CustomId.Split("-");
+                        var data = button.Data.CustomId.Split("_");
 
                         // 3 data meaans we have a first message id
                         if (data.Count() == 3)
@@ -265,7 +265,7 @@ namespace TimeBot.Interactions
                             {
                                 x.Embed = secondEmbed;
                                 x.Components = new ComponentBuilder()
-                                .WithButton("Refresh", $"refresh-country-{data[2]}", ButtonStyle.Secondary)
+                                .WithButton("Refresh", $"refresh_country_{data[2]}", ButtonStyle.Secondary)
                                 .Build();
                             });
                         }
@@ -349,7 +349,7 @@ namespace TimeBot.Interactions
         }
 
         // /timesetup
-        public static async Task TimeSetup(this SocketInteraction interaction)
+        public static async Task TimeSetupForSelf(this SocketInteraction interaction)
         {
             var embed = new EmbedBuilder()
                 .WithColor(Utilities.Blue)
@@ -362,7 +362,7 @@ namespace TimeBot.Interactions
             }
             else if (interaction is SocketMessageComponent buttonCommand)
             {
-                var args = buttonCommand.Data.CustomId.Split("-");
+                var args = buttonCommand.Data.CustomId.Split("_");
 
                 // Previous and Next Page buttons
                 if (buttonCommand.Data.CustomId.StartsWith("lastpage"))
@@ -455,7 +455,7 @@ namespace TimeBot.Interactions
         }
 
         // Set a user's time
-        public static async Task SetUserTime(this SocketInteraction interaction)
+        public static async Task SetTimeForSomeoneElse(this SocketInteraction interaction)
         {
             /// Check if they're an admin
             if (!((SocketGuildUser)interaction.User).GuildPermissions.Administrator)
@@ -475,24 +475,24 @@ namespace TimeBot.Interactions
 
             if (interaction is SocketSlashCommand slashCommand)
             {
-                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)slashCommand.Data.Options.ElementAt(0).Value).Id), ephemeral: true);
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)slashCommand.Data.Options.ElementAt(0).Value).Id, true), ephemeral: true);
             }
             else if (interaction is SocketMessageComponent buttonCommand)
             {
-                var args = buttonCommand.Data.CustomId.Split("-");
+                var args = buttonCommand.Data.CustomId.Split("_");
 
                 var target = args[2];
 
                 // Previous and Next Page buttons
-                if (buttonCommand.Data.CustomId.StartsWith("lastpage"))
+                if (buttonCommand.Data.CustomId.StartsWith("otherlastpage"))
                 {
                     await buttonCommand.UpdateAsync(x =>
                     {
                         x.Embed = embed;
-                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, Convert.ToUInt64(target));
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, Convert.ToUInt64(target), true);
                     });
                 }
-                else if (buttonCommand.Data.CustomId.StartsWith("nextpage"))
+                else if (buttonCommand.Data.CustomId.StartsWith("othernextpage"))
                 {
                     try
                     {
@@ -500,7 +500,7 @@ namespace TimeBot.Interactions
                         {
                             x.Embed = embed;
                             x.Components =
-                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, Convert.ToUInt64(target));
+                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, Convert.ToUInt64(target), true);
                         });
                     }
                     catch (Exception e)
@@ -519,7 +519,7 @@ namespace TimeBot.Interactions
                     x.Embed = new EmbedBuilder()
                         .WithTitle("Success")
                         .WithDescription(
-                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, ((SocketGuildUser)buttonCommand.User).Nickname ?? buttonCommand.User.Username)}\n\nIf the time is wrong, try again. Do `/timesetup` again.")
+                            $"You have succesfully set your time.\n\n{StatsHandler.GetTime(account, "for them")}\n\nIf the time is wrong, try again. Do `/set-user-time` again.")
                         .WithColor(Utilities.Green)
                         .Build();
                     x.Components = null;

@@ -170,8 +170,10 @@ namespace TimeBot
         /// <summary>
         /// Get buttons of TimeZones
         /// </summary>
-        public static MessageComponent GetPaginatedTimeZones(int page, ulong userId)
+        public static MessageComponent GetPaginatedTimeZones(int page, ulong userId, bool forOther = false)
         {
+            var prefix = forOther ? "other" : "";
+
             var zones = List.GetRange(page * 20, 20);
 
             var row = 0;
@@ -188,11 +190,11 @@ namespace TimeBot
 
                 var zone = TimeZoneInfo.FindSystemTimeZoneById(zones.ElementAt(i));
                 component.WithButton(
-                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"set-{userId}-{zone.Id}"), row);
+                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"{prefix}set_{userId}_{zone.Id}"), row);
             }
-            component.WithButton(new ButtonBuilder("Previous Page", $"lastpage-{page}-{userId}", disabled: page == 0),
+            component.WithButton(new ButtonBuilder("Previous Page", $"{prefix}lastpage_{page}_{userId}", disabled: page == 0),
                 row + 1);
-            component.WithButton(new ButtonBuilder("Next Page", $"nextpage-{page}-{userId}", disabled: page == 6), row + 1);
+            component.WithButton(new ButtonBuilder("Next Page", $"{prefix}nextpage_{page}_{userId}", disabled: page == 6), row + 1);
             return component.Build();
         }
     }

@@ -47,7 +47,7 @@ namespace TimeBot.Interactions
                     break;
 
                 case "timesetup":
-                    await command.TimeSetup();
+                    await command.TimeSetupForSelf();
                     break;
 
                 case "set-user-country":
@@ -55,7 +55,7 @@ namespace TimeBot.Interactions
                     break;
 
                 case "set-user-time":
-                    await command.SetUserTime();
+                    await command.SetTimeForSomeoneElse();
                     break;
 
                 default:
