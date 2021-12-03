@@ -50,8 +50,14 @@ namespace TimeBot
 
                 // Button
                 case SocketMessageComponent buttonCommand:
+                    // "Refresh" button on /countryall
                     if (buttonCommand.Data.CustomId.StartsWith("refresh_country"))
                         await buttonCommand.ShowCountryForAll();
+
+                    // "Refresh" button on /time
+                    else if (buttonCommand.Data.CustomId.StartsWith("refresh_user"))
+                        await buttonCommand.ShowCountryForAll();
+
                     else if (buttonCommand.Data.CustomId.StartsWith("other"))
                         await buttonCommand.SetTimeForSomeoneElse();
                     else

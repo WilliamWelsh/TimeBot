@@ -13,10 +13,27 @@ namespace TimeBot.Interactions
     public static class SlashFunctions
     {
         // /time (SocketGuildUser)
-        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}").Build());
 
         // /time (RestUser)
-        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}").Build());
+
+        // "Refresh" button on /time
+        public static async Task RefreshUserTime(this SocketMessageComponent command)
+        {
+            // Custom Id: refresh_user-UserIdHere
+            var user = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[0]));
+
+            // Update the message
+            await command.UpdateAsync(async x =>
+            {
+                x.Embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+
+                x.Components = new ComponentBuilder()
+                    .WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary)
+                    .Build();
+            });
+        }
 
         // /country (SocketGuildUser)
         public static async Task ShowCountry(this SocketSlashCommand command, SocketGuildUser user)
