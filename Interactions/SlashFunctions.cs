@@ -89,7 +89,7 @@ namespace TimeBot.Interactions
             }
 
             // Sort by earliest time to latest
-            var sortedList = validAccounts.OrderBy(u => u.Time);
+            var sortedList = validAccounts.OrderBy(u => u.User.Nickname ?? u.User.Username).ThenBy(u => u.Time);
 
             var firstLine = new StringBuilder();
             var secondLIne = new StringBuilder();
