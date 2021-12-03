@@ -153,7 +153,7 @@ namespace TimeBot.Interactions
                     var actualCountryName = countryName.Replace("_", " ");
 
                     // Flag Emoji
-                    var flagEmoji = Countries.List.FirstOrDefault(c => String.Equals(c.Key, countryName, StringComparison.CurrentCultureIgnoreCase)).Value;
+                    var flagEmoji = Countries.List.FirstOrDefault(c => String.Equals(c.Key, actualCountryName, StringComparison.CurrentCultureIgnoreCase)).Value;
 
                     // Get all users that have this country name
                     var users = from a in validAccounts
