@@ -56,7 +56,7 @@ namespace TimeBot
 
                     // "Refresh" button on /time
                     else if (buttonCommand.Data.CustomId.StartsWith("refresh_user"))
-                        await buttonCommand.ShowCountryForAll();
+                        await buttonCommand.RefreshUserTime();
 
                     else if (buttonCommand.Data.CustomId.StartsWith("other"))
                         await buttonCommand.SetTimeForSomeoneElse();

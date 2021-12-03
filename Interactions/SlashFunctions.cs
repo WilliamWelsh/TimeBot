@@ -13,21 +13,23 @@ namespace TimeBot.Interactions
     public static class SlashFunctions
     {
         // /time (SocketGuildUser)
-        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}").Build());
+        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
 
         // /time (RestUser)
-        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}").Build());
+        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
 
         // "Refresh" button on /time
         public static async Task RefreshUserTime(this SocketMessageComponent command)
         {
             // Custom Id: refresh_user-UserIdHere
-            var user = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[0]));
+            var user = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
+
+            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
 
             // Update the message
-            await command.UpdateAsync(async x =>
+            await command.UpdateAsync(x =>
             {
-                x.Embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+                x.Embed = embed;
 
                 x.Components = new ComponentBuilder()
                     .WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary)
@@ -47,7 +49,7 @@ namespace TimeBot.Interactions
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : $"{country} {Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.CurrentCultureIgnoreCase)).Value}")
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
 
@@ -63,7 +65,7 @@ namespace TimeBot.Interactions
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : $"{country} {Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.CurrentCultureIgnoreCase)).Value}")
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
 
@@ -170,7 +172,7 @@ namespace TimeBot.Interactions
                     var actualCountryName = countryName.Replace("_", " ");
 
                     // Flag Emoji
-                    var flagEmoji = Countries.List.FirstOrDefault(c => String.Equals(c.Key, actualCountryName, StringComparison.CurrentCultureIgnoreCase)).Value;
+                    var flagEmoji = Countries.GetEmoji(actualCountryName);
 
                     // Get all users that have this country name
                     var users = from a in validAccounts

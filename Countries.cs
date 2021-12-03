@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace TimeBot
 {
     public static class Countries
     {
+        public static string GetEmoji(string country) => List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.CurrentCultureIgnoreCase)).Value;
+
         // Make a dictionary of country names and their flag as an emoji
         public static Dictionary<string, string> List = new Dictionary<string, string>
         {

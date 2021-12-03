@@ -6,14 +6,15 @@ namespace TimeBot
 {
     public static class StatsHandler
     {
+        // Get their stats as an embed
         public static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
-                .WithAuthor(new EmbedAuthorBuilder()
+            .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
-                .WithDescription($"{GetTime(account, name)}")
-                .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithFooter($"{GetCountry(account)}{account.timeZoneId}")
-                .Build();
+            .WithDescription($"{GetTime(account, name)}")
+            .WithColor(await Utilities.GetUserColor(avatarURL))
+            .WithFooter($"{GetCountry(account, true)}{account.timeZoneId}")
+            .Build();
 
         // Display a User's local time
         public static string GetTime(UserAccount account, string name)
@@ -25,7 +26,7 @@ namespace TimeBot
         }
 
         // Display a User's country
-        public static string GetCountry(UserAccount account)
-            => account.country == "Not set." ? "" : $"{account.country} | ";
+        public static string GetCountry(UserAccount account, bool separate = false)
+            => account.country == "Not set." ? "" : $"{account.country}{(separate ? " | " : "")}";
     }
 }
