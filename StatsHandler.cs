@@ -12,7 +12,7 @@ namespace TimeBot
                 .WithIconUrl(avatarURL))
                 .WithDescription($"{GetTime(account, name)}")
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithFooter($"{GetCountry(account)} | {account.timeZoneId}")
+                .WithFooter($"{GetCountry(account)}{account.timeZoneId}")
                 .Build();
 
         // Display a User's local time
@@ -26,6 +26,6 @@ namespace TimeBot
 
         // Display a User's country
         public static string GetCountry(UserAccount account)
-            => account.country == "Not set." ? "" : account.country;
+            => account.country == "Not set." ? "" : $"{account.country} | ";
     }
 }
