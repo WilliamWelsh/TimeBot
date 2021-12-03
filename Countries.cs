@@ -6,7 +6,7 @@ namespace TimeBot
     public static class Countries
     {
         // Make a dictionary of country names and their flag as an emoji
-        public static Dictionary<string, string> List = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase)
+        public static Dictionary<string, string> List = new Dictionary<string, string>
         {
             {"Afghanistan", "🇦🇫"},
             {"Albania", "🇦🇱"},

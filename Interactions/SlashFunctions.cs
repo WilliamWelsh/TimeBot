@@ -153,7 +153,7 @@ namespace TimeBot.Interactions
                     var actualCountryName = countryName.Replace("_", " ");
 
                     // Flag Emoji
-                    var flagEmoji = Countries.List.FirstOrDefault(c => c.Key == actualCountryName).Value;
+                    var flagEmoji = Countries.List.FirstOrDefault(c => String.Equals(c.Key, countryName, StringComparison.CurrentCultureIgnoreCase)).Value;
 
                     // Get all users that have this country name
                     var users = from a in validAccounts
@@ -307,7 +307,7 @@ namespace TimeBot.Interactions
             var country = command.Data.Options.ElementAt(0).Value.ToString();
 
             // Check if it's a valid country name
-            if (!Countries.List.ContainsKey(country))
+            if (!Countries.List.Any(c => String.Equals(c.Key, country, StringComparison.OrdinalIgnoreCase)))
             {
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
@@ -319,7 +319,7 @@ namespace TimeBot.Interactions
 
             // Save the target's country
             var account = UserAccounts.GetAccount(command.User.Id);
-            account.country = Countries.List.Where(c => c.Key == country).First().Key;
+            account.country = Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.OrdinalIgnoreCase)).Key;
             UserAccounts.SaveAccounts();
 
             // Send them the result
@@ -428,7 +428,7 @@ namespace TimeBot.Interactions
             var country = command.Data.Options.ElementAt(1).Value.ToString();
 
             // Check if it's a valid country name
-            if (!Countries.List.ContainsKey(country))
+            if (!Countries.List.Any(c => String.Equals(c.Key, country, StringComparison.OrdinalIgnoreCase)))
             {
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
@@ -440,7 +440,7 @@ namespace TimeBot.Interactions
 
             // Save the target's country
             var account = UserAccounts.GetAccount(target.Id);
-            account.country = Countries.List.Where(c => c.Key == country).First().Key;
+            account.country = Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.OrdinalIgnoreCase)).Key;
             UserAccounts.SaveAccounts();
 
             // Send them the result
