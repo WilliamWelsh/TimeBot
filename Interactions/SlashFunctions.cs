@@ -47,7 +47,7 @@ namespace TimeBot.Interactions
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : $"{country} {Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.CurrentCultureIgnoreCase)).Value}")
                 .Build());
         }
 
@@ -63,7 +63,7 @@ namespace TimeBot.Interactions
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
                 .WithColor(await Utilities.GetUserColor(avatarURL))
-                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
+                .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : $"{country} {Countries.List.FirstOrDefault(c => String.Equals(c.Key, country, StringComparison.CurrentCultureIgnoreCase)).Value}")
                 .Build());
         }
 
