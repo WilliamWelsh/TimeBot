@@ -45,7 +45,8 @@ namespace TimeBot
                     var user = (SocketGuildUser)userCommand.Data.Member;
                     await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(
                         UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username,
-                        user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()));
+                        user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()),
+                        component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{userCommand.Data.Member.Id}", style: ButtonStyle.Secondary).Build());
                     break;
 
                 // Button
