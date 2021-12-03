@@ -152,6 +152,9 @@ namespace TimeBot.Interactions
                     // We had to put underscores in for the hashtable
                     var actualCountryName = countryName.Replace("_", " ");
 
+                    // Flag Emoji
+                    var flagEmoji = Countries.List.FirstOrDefault(c => c.Key == actualCountryName).Value;
+
                     // Get all users that have this country name
                     var users = from a in validAccounts
                                 where a.UserAccount.country == actualCountryName
@@ -171,7 +174,7 @@ namespace TimeBot.Interactions
                     if (firstFieldList.Count < 24)
                     {
                         firstFieldList.Add(new EmbedFieldBuilder()
-                            .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)}")
+                            .WithName($"{actualCountryName} {flagEmoji}")
                             .WithValue(description)
                             .WithIsInline(false));
 
@@ -180,7 +183,7 @@ namespace TimeBot.Interactions
                         if (descriptionTwo != "")
                         {
                             firstFieldList.Add(new EmbedFieldBuilder()
-                                .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)} (Continued)")
+                                .WithName($"{actualCountryName} {flagEmoji} (Continued)")
                                 .WithValue(descriptionTwo)
                                 .WithIsInline(false));
                         }
@@ -188,7 +191,7 @@ namespace TimeBot.Interactions
                     else
                     {
                         secondFieldList.Add(new EmbedFieldBuilder()
-                            .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)}")
+                            .WithName($"{actualCountryName} {flagEmoji}")
                             .WithValue(description)
                             .WithIsInline(false));
 
@@ -197,7 +200,7 @@ namespace TimeBot.Interactions
                         if (descriptionTwo != "")
                         {
                             secondFieldList.Add(new EmbedFieldBuilder()
-                                .WithName($"{actualCountryName} {Countries.GetFlagEmoji(actualCountryName)} (Continued)")
+                                .WithName($"{actualCountryName} {flagEmoji} (Continued)")
                                 .WithValue(descriptionTwo)
                                 .WithIsInline(false));
                         }
@@ -304,7 +307,7 @@ namespace TimeBot.Interactions
             var country = command.Data.Options.ElementAt(0).Value.ToString();
 
             // Check if it's a valid country name
-            if (!Countries.List.Contains(country, StringComparer.CurrentCultureIgnoreCase))
+            if (!Countries.List.ContainsKey(country))
             {
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
@@ -314,12 +317,9 @@ namespace TimeBot.Interactions
                 return;
             }
 
-            // Find the country input and set it to the capitlized version
-            var index = Countries.List.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
-
             // Save the target's country
             var account = UserAccounts.GetAccount(command.User.Id);
-            account.country = Countries.List.ElementAt(index);
+            account.country = Countries.List.Where(c => c.Key == country).First().Key;
             UserAccounts.SaveAccounts();
 
             // Send them the result
@@ -428,7 +428,7 @@ namespace TimeBot.Interactions
             var country = command.Data.Options.ElementAt(1).Value.ToString();
 
             // Check if it's a valid country name
-            if (!Countries.List.Contains(country, StringComparer.CurrentCultureIgnoreCase))
+            if (!Countries.List.ContainsKey(country))
             {
                 await command.RespondAsync(embed: new EmbedBuilder()
                     .WithTitle("Error")
@@ -438,12 +438,9 @@ namespace TimeBot.Interactions
                 return;
             }
 
-            // Find the country input and set it to the capitlized version
-            var index = Countries.List.FindIndex(x => x.Equals(country, StringComparison.OrdinalIgnoreCase));
-
             // Save the target's country
             var account = UserAccounts.GetAccount(target.Id);
-            account.country = Countries.List.ElementAt(index);
+            account.country = Countries.List.Where(c => c.Key == country).First().Key;
             UserAccounts.SaveAccounts();
 
             // Send them the result
