@@ -15,14 +15,14 @@ namespace TimeBot.Interactions
                     if (command.Data.Options == null)
                         await command.ShowTime((SocketGuildUser)command.User);
                     else
-                        await command.ShowTime(await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
+                        await command.ShowTime(await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
 
                 case "country":
                     if (command.Data.Options == null)
                         await command.ShowCountry((SocketGuildUser)command.User);
                     else
-                        await command.ShowCountry(await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
+                        await command.ShowCountry(await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
 
                 case "timeall":

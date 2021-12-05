@@ -1,6 +1,5 @@
 ﻿using System;
 using Discord;
-using Discord.Rest;
 using Discord.Commands;
 using System.Reflection;
 using Discord.WebSocket;
@@ -13,13 +12,11 @@ namespace TimeBot
     public static class EventHandler
     {
         public static DiscordSocketClient _socketClient;
-        public static DiscordRestClient _restClient;
         public static CommandService _service;
 
-        public static async Task InitializeAsync(DiscordSocketClient socketClient, DiscordRestClient restClient)
+        public static async Task InitializeAsync(DiscordSocketClient socketClient)
         {
             _socketClient = socketClient;
-            _restClient = restClient;
 
             _service = new CommandService();
             await _service.AddModulesAsync(Assembly.GetEntryAssembly(), null);

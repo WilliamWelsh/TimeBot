@@ -22,7 +22,7 @@ namespace TimeBot.Interactions
         public static async Task RefreshUserTime(this SocketMessageComponent command)
         {
             // Custom Id: refresh_user-UserIdHere
-            var user = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
+            var user = await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
 
             var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
 
@@ -72,7 +72,7 @@ namespace TimeBot.Interactions
         // /timeall
         public static async Task ShowTimeForAll(this SocketSlashCommand command)
         {
-            var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
+            var Users = (await EventHandler._socketClient.Rest.GetGuildAsync(((SocketGuildUser)command.User).Guild.Id)).GetUsersAsync();
             var validAccounts = new List<ListItem>();
 
             await foreach (var List in Users)
@@ -132,7 +132,7 @@ namespace TimeBot.Interactions
         {
             try
             {
-                var Users = (await EventHandler._restClient.GetGuildAsync(((SocketGuildUser)interaction.User).Guild.Id)).GetUsersAsync();
+                var Users = (await EventHandler._socketClient.Rest.GetGuildAsync(((SocketGuildUser)interaction.User).Guild.Id)).GetUsersAsync();
                 var validAccounts = new List<ListItem>();
                 await foreach (var List in Users)
                 {
@@ -442,7 +442,7 @@ namespace TimeBot.Interactions
             }
 
             // Get the account of the user
-            var target = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id);
+            var target = await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id);
 
             var country = command.Data.Options.ElementAt(1).Value.ToString();
 

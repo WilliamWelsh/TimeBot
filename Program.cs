@@ -1,7 +1,6 @@
 ﻿using System;
 using Discord;
 using System.IO;
-using Discord.Rest;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using DiscordBotsList.Api;
@@ -26,9 +25,6 @@ namespace TimeBot
                 return;
             }
 
-            var _restClient = new DiscordRestClient(new DiscordRestConfig());
-            await _restClient.LoginAsync(TokenType.Bot, File.ReadAllText("Resources/botToken.txt"));
-
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
@@ -49,7 +45,7 @@ namespace TimeBot
             _client.LeftGuild += OnGuildLeft;
 
             // Set up the event handler
-            await EventHandler.InitializeAsync(_client, _restClient);
+            await EventHandler.InitializeAsync(_client);
             await _client.SetGameAsync("/timehelp");
 
             await Task.Delay(-1).ConfigureAwait(false);
