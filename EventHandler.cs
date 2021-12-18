@@ -59,8 +59,23 @@ namespace TimeBot
                     else if (buttonCommand.Data.CustomId.StartsWith("refresh_user"))
                         await buttonCommand.RefreshUserTime();
 
+                    // /set-user-time timezone selection
                     else if (buttonCommand.Data.CustomId.StartsWith("other"))
                         await buttonCommand.SetTimeForSomeoneElse();
+
+                    // /timezone timezone selection
+                    else if (buttonCommand.Data.CustomId.StartsWith("addtimezone"))
+                        await buttonCommand.AddTimeZone();
+
+                    // /timezone refresh button
+                    else if (buttonCommand.Data.CustomId.StartsWith("refresh_timezone"))
+                        await buttonCommand.UpdateTimezones();
+
+                    // /timezone "Add TimeZone" button
+                    else if (buttonCommand.Data.CustomId.StartsWith("addanothertimezone"))
+                        await buttonCommand.AddTimeZone();
+
+                    // /timesetup timezone selection
                     else
                         await buttonCommand.TimeSetupForSelf();
                     break;

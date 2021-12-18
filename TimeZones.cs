@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Discord;
-using Discord.WebSocket;
 
 namespace TimeBot
 {
@@ -170,10 +170,8 @@ namespace TimeBot
         /// <summary>
         /// Get buttons of TimeZones
         /// </summary>
-        public static MessageComponent GetPaginatedTimeZones(int page, ulong userId, bool forOther = false)
+        public static MessageComponent GetPaginatedTimeZones(int page, string data, string prefix = "")
         {
-            var prefix = forOther ? "other" : "";
-
             var zones = List.GetRange(page * 20, 20);
 
             var row = 0;
@@ -190,12 +188,34 @@ namespace TimeBot
 
                 var zone = TimeZoneInfo.FindSystemTimeZoneById(zones.ElementAt(i));
                 component.WithButton(
-                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"{prefix}set_{userId}_{zone.Id}"), row);
+                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"{prefix}set_{data}_{zone.Id}"), row);
             }
-            component.WithButton(new ButtonBuilder("Previous Page", $"{prefix}lastpage_{page}_{userId}", disabled: page == 0),
+
+            component.WithButton(new ButtonBuilder("Previous Page", $"{prefix}lastpage_{page}_{data}", disabled: page == 0),
                 row + 1);
-            component.WithButton(new ButtonBuilder("Next Page", $"{prefix}nextpage_{page}_{userId}", disabled: page == 6), row + 1);
+            component.WithButton(new ButtonBuilder("Next Page", $"{prefix}nextpage_{page}_{data}", disabled: page == 6), row + 1);
+
             return component.Build();
+        }
+
+        /// <summary>
+        /// Get a list of timezones and their current time for /timezone
+        /// </summary>
+        public static string GetTimeZoneTimes(string data)
+        {
+            // This is a list of numbers, each number
+            // is an index of a timezone in the List
+            var timezoneIndices = data.Split(",");
+
+            var result = new StringBuilder();
+
+            foreach (var zone in timezoneIndices)
+            {
+                var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone)));
+                result.AppendLine($"**{timezoneInfo.Id}** {TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezoneInfo.Id).ToString("h:mm tt dddd, MMMM d")}");
+            }
+
+            return result.ToString();
         }
     }
 }
