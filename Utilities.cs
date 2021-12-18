@@ -35,5 +35,10 @@ namespace TimeBot
                 return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
             }
         }
+
+        /// <summary>
+        /// Return the "a minute ago" discord text
+        /// </summary>
+        public static string GetTimeStampedText() => $"<t:{((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds)}:R>";
     }
 }

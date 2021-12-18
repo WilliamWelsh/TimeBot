@@ -24,7 +24,7 @@ namespace TimeBot.Interactions
             // Custom Id: refresh_user-UserIdHere
             var user = await EventHandler._restClient.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
 
-            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(), true);
 
             // Update the message
             await command.UpdateAsync(x =>
