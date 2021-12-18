@@ -619,7 +619,7 @@ namespace TimeBot.Interactions
 
                     x.Components = new ComponentBuilder()
                         .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
-                        .WithButton("Add TimeZone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                        .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
                         .Build();
                 });
             }
@@ -642,7 +642,7 @@ namespace TimeBot.Interactions
 
                     x.Components = new ComponentBuilder()
                         .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
-                        .WithButton("Add TimeZone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                        .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
                         .Build();
                 });
         }
