@@ -213,7 +213,7 @@ namespace TimeBot
                 timezones.Add(new TimeZone(TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone)))));
 
             // Sort the list
-            timezones = timezones.OrderBy(x => x.RawTime).ToList();
+            timezones = timezones.OrderBy(x => x.RawTime).Reverse().ToList();
 
             var result = new StringBuilder();
 
