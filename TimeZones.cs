@@ -207,15 +207,34 @@ namespace TimeBot
             // is an index of a timezone in the List
             var timezoneIndices = data.Split(",");
 
-            var result = new StringBuilder();
+            var timezones = new List<TimeZone>();
 
             foreach (var zone in timezoneIndices)
-            {
-                var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone)));
-                result.AppendLine($"**{timezoneInfo.Id}** {TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timezoneInfo.Id).ToString("h:mm tt dddd, MMMM d")}");
-            }
+                timezones.Add(new TimeZone(TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone)))));
+
+            // Sort the list
+            timezones = timezones.OrderBy(x => x.RawTime).ToList();
+
+            var result = new StringBuilder();
+
+            foreach (var zone in timezones)
+                result.AppendLine($"**{zone.Info.Id}** {zone.HumanTime}");
 
             return result.ToString();
+        }
+    }
+
+    public class TimeZone
+    {
+        public TimeZoneInfo Info { get; set; }
+        public DateTime RawTime { get; set; }
+        public string HumanTime { get; set; }
+
+        public TimeZone(TimeZoneInfo info)
+        {
+            Info = info;
+            RawTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, info.Id);
+            HumanTime = RawTime.ToString("h:mm tt dddd, MMMM d");
         }
     }
 }
