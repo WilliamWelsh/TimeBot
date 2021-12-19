@@ -614,7 +614,7 @@ namespace TimeBot.Interactions
 
                     x.Components = new ComponentBuilder()
                         .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
-                        .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                        .WithButton("Edit Timezones", $"edittimezones_{data}", ButtonStyle.Secondary)
                         .Build();
                 });
             }
@@ -637,9 +637,51 @@ namespace TimeBot.Interactions
 
                     x.Components = new ComponentBuilder()
                         .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
-                        .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                        .WithButton("Edit Timezones", $"edittimezones_{data}", ButtonStyle.Secondary)
                         .Build();
                 });
+        }
+
+        /// <summary>
+        /// The "Edit Timezones" button on /timezones
+        /// </summary>
+        public static async Task ShowEditMenuForTimeZonesCommand(this SocketMessageComponent command)
+        {
+            try
+            {
+                /// Check if they're an admin
+                if (!((SocketGuildUser)command.User).GuildPermissions.Administrator)
+                {
+                    await command.RespondAsync(embed: new EmbedBuilder()
+                        .WithTitle("Error")
+                        .WithDescription("Only admins can add timezones.")
+                        .WithColor(Utilities.Red)
+                        .Build(), ephemeral: true);
+                    return;
+                }
+
+                var data = command.Data.CustomId.Split("_")[1];
+                await command.UpdateAsync(x =>
+                    {
+                        x.Embed = new EmbedBuilder()
+                            .WithTitle("Current Time by Timezone")
+                            .WithDescription(
+                                $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                            .WithColor(Utilities.Blue)
+                            .Build();
+
+                        x.Components = new ComponentBuilder()
+                            .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                            .WithButton("Remove Timezone", $"removetimezone_{data}", ButtonStyle.Secondary, disabled: true)
+                            .WithButton("Cancel", $"refresh_timezones-{data}", ButtonStyle.Secondary)
+                            .Build();
+                    });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
         }
     }
 }

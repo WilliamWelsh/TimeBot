@@ -75,6 +75,10 @@ namespace TimeBot
                     else if (buttonCommand.Data.CustomId.StartsWith("addanothertimezone"))
                         await buttonCommand.AddTimeZone();
 
+                    // /timezone "Edit Timezones" button
+                    else if (buttonCommand.Data.CustomId.StartsWith("edittimezones"))
+                        await buttonCommand.ShowEditMenuForTimeZonesCommand();
+
                     // /timesetup timezone selection
                     else
                         await buttonCommand.TimeSetupForSelf();
