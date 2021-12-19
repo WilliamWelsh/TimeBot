@@ -11,7 +11,7 @@ namespace TimeBot
             .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
-            .WithDescription($"{(appendRefreshTime ? $"Last refreshed {Utilities.GetTimeStampedText()}\n\n" : "")}{GetTime(account, name)}")
+            .WithDescription($"{(appendRefreshTime ? $"{Utilities.GetRefreshedTimeText()}\n\n" : "")}{GetTime(account, name)}")
             .WithColor(await Utilities.GetUserColor(avatarURL))
             .WithFooter($"{GetCountry(account, true)}{account.timeZoneId}")
             .Build();

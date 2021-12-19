@@ -350,22 +350,17 @@ namespace TimeBot.Interactions
         }
 
         // /timestats
-        public static async Task ShowStats(this SocketSlashCommand command)
-        {
-            var totalMembers = EventHandler._socketClient.Guilds.Sum(Guild => Guild.MemberCount);
-
-            await command.RespondAsync(embed: new EmbedBuilder()
-                .WithTitle("Bot Info")
-                .WithColor(Utilities.Blue)
-                .WithThumbnailUrl("https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128")
-                .AddField("Library", "Discord.Net.Labs")
-                .AddField("Servers", EventHandler._socketClient.Guilds.Count)
-                .AddField("Members", totalMembers.ToString("#,##0"))
-                .AddField("Developer", "Reverse#0069")
-                .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
-                .AddField("Links", $"[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server]({Utilities.SupportServer})")
-                .Build()).ConfigureAwait(false);
-        }
+        public static async Task ShowStats(this SocketSlashCommand command) => await command.RespondAsync(embed: new EmbedBuilder()
+            .WithTitle("Bot Info")
+            .WithColor(Utilities.Blue)
+            .WithThumbnailUrl("https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128")
+            .AddField("Library", "Discord.Net.Labs")
+            .AddField("Servers", EventHandler._socketClient.Guilds.Count)
+            .AddField("Members", EventHandler._socketClient.Guilds.Sum(Guild => Guild.MemberCount).ToString("#,##0"))
+            .AddField("Developer", "Reverse#0069")
+            .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
+            .AddField("Links", $"[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server]({Utilities.SupportServer})")
+            .Build()).ConfigureAwait(false);
 
         // /timesetup
         public static async Task TimeSetupForSelf(this SocketInteraction interaction)
@@ -613,7 +608,7 @@ namespace TimeBot.Interactions
                     x.Embed = new EmbedBuilder()
                         .WithTitle("Current Time by Timezone")
                         .WithDescription(
-                            $"Last refreshed {Utilities.GetTimeStampedText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
                         .WithColor(Utilities.Blue)
                         .Build();
 
@@ -636,7 +631,7 @@ namespace TimeBot.Interactions
                     x.Embed = new EmbedBuilder()
                         .WithTitle("Current Time by Timezone")
                         .WithDescription(
-                            $"Last refreshed {Utilities.GetTimeStampedText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
                         .WithColor(Utilities.Blue)
                         .Build();
 

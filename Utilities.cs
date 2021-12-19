@@ -39,6 +39,6 @@ namespace TimeBot
         /// <summary>
         /// Return the "a minute ago" discord text
         /// </summary>
-        public static string GetTimeStampedText() => $"<t:{((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds)}:R>";
+        public static string GetRefreshedTimeText() => $"Last refreshed <t:{((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds)}:R>";
     }
 }

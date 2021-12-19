@@ -210,7 +210,7 @@ namespace TimeBot
             var timezones = new List<TimeZone>();
 
             foreach (var zone in timezoneIndices)
-                timezones.Add(new TimeZone(TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone)))));
+                timezones.Add(new TimeZone(TimeZoneInfo.FindSystemTimeZoneById(List.ElementAt(Convert.ToInt32(zone))).Id));
 
             // Sort the list
             timezones = timezones.OrderBy(x => x.RawTime).Reverse().ToList();
@@ -218,7 +218,7 @@ namespace TimeBot
             var result = new StringBuilder();
 
             foreach (var zone in timezones)
-                result.AppendLine($"**{zone.Info.Id}** {zone.HumanTime}");
+                result.AppendLine($"**{zone.TimeZoneId}** {zone.RawTime.ToString("h:mm tt dddd, MMMM d")}");
 
             return result.ToString();
         }
@@ -226,15 +226,13 @@ namespace TimeBot
 
     public class TimeZone
     {
-        public TimeZoneInfo Info { get; set; }
+        public string TimeZoneId { get; set; }
         public DateTime RawTime { get; set; }
-        public string HumanTime { get; set; }
 
-        public TimeZone(TimeZoneInfo info)
+        public TimeZone(string timezoneId)
         {
-            Info = info;
-            RawTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, info.Id);
-            HumanTime = RawTime.ToString("h:mm tt dddd, MMMM d");
+            TimeZoneId = timezoneId;
+            RawTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, TimeZoneId);
         }
     }
 }

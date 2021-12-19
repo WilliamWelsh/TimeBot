@@ -34,6 +34,7 @@ namespace TimeBot
                 LogLevel = LogSeverity.Verbose,
                 GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMembers
             });
+
             _client.Log += Log;
 
             await _client.LoginAsync(TokenType.Bot, File.ReadAllText("Resources/botToken.txt"));

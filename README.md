@@ -33,7 +33,8 @@ This bot can provide the local time and country for a user. This is useful if yo
 `/timeall` View the time for everyone.  
 `/countryall` View the time for everyone (grouped by country).  
 `/timehelp` View the help menu.  
-`/timestats` View stats for the bot.
+`/timestats` View stats for the bot.  
+`/timezones` Set up a timezones clock.
 
 ## Countries
 
