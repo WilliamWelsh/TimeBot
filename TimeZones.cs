@@ -188,7 +188,7 @@ namespace TimeBot
 
                 var zone = TimeZoneInfo.FindSystemTimeZoneById(zones.ElementAt(i));
                 component.WithButton(
-                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"{prefix}set_{data}_{zone.Id}"), row);
+                    new ButtonBuilder($"{GetTimeByTimeZone(zone.Id)} {zone.Id}", $"{prefix}set_{data}_{zone.Id}", ButtonStyle.Secondary), row);
             }
 
             component.WithButton(new ButtonBuilder("Previous Page", $"{prefix}lastpage_{page}_{data}", disabled: page == 0),
