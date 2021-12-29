@@ -293,6 +293,7 @@ namespace TimeBot.Interactions
                         }
                         else
                         {
+                            firstEmbed = firstEmbed.ToEmbedBuilder().WithDescription(Utilities.GetRefreshedTimeText()).Build();
                             await button.UpdateAsync(x =>
                             {
                                 x.Embed = firstEmbed;
