@@ -278,6 +278,8 @@ namespace TimeBot.Interactions
                     case SocketMessageComponent button:
                         var data = button.Data.CustomId.Split("_");
 
+                        firstEmbed = firstEmbed.ToEmbedBuilder().WithDescription(Utilities.GetRefreshedTimeText()).Build();
+
                         // 3 data meaans we have a first message id
                         if (data.Count() == 3)
                         {
@@ -293,7 +295,6 @@ namespace TimeBot.Interactions
                         }
                         else
                         {
-                            firstEmbed = firstEmbed.ToEmbedBuilder().WithDescription(Utilities.GetRefreshedTimeText()).Build();
                             await button.UpdateAsync(x =>
                             {
                                 x.Embed = firstEmbed;
