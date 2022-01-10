@@ -6,8 +6,15 @@ namespace TimeBot.UserData
 {
     public static class DateStorage
     {
-        // Save user accounts
+        // Save User accounts
         public static void SaveUserAccounts(IEnumerable<UserAccount> accounts, string filePath)
+        {
+            var json = JsonConvert.SerializeObject(accounts, Formatting.None);
+            File.WriteAllText(filePath, json);
+        }
+
+        // Save Guild accounts
+        public static void SaveGuildAccounts(IEnumerable<GuildAccount> accounts, string filePath)
         {
             var json = JsonConvert.SerializeObject(accounts, Formatting.None);
             File.WriteAllText(filePath, json);
@@ -19,6 +26,14 @@ namespace TimeBot.UserData
             if (!File.Exists(filePath)) return null;
             var json = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<List<UserAccount>>(json);
+        }
+
+        // Load Guild Accounts
+        public static IEnumerable<GuildAccount> LoadGuildAccounts(string filePath)
+        {
+            if (!File.Exists(filePath)) return null;
+            var json = File.ReadAllText(filePath);
+            return JsonConvert.DeserializeObject<List<GuildAccount>>(json);
         }
 
         // Check if a save exists

@@ -13,10 +13,21 @@ namespace TimeBot.Interactions
     public static class SlashFunctions
     {
         // /time (SocketGuildUser)
-        public static async Task ShowTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
+        public static async Task ShowUserTime(this SocketSlashCommand command, SocketGuildUser user) => await command.RespondAsync(embed: await StatsHandler.UserStatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
 
         // /time (RestUser)
-        public static async Task ShowTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
+        public static async Task ShowUserTime(this SocketSlashCommand command, RestGuildUser user) => await command.RespondAsync(embed: await StatsHandler.UserStatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()), component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary).Build());
+
+        // /servertime 
+        public static async Task ShowServerTime(this SocketSlashCommand command)
+        {
+            var guild = ((SocketGuildUser)command.User).Guild;
+            await command.RespondAsync(embed: await StatsHandler.ServerStatsEmbed(GuildAccounts.GetAccount(guild.Id), guild),
+                component: new ComponentBuilder()
+                .WithButton("Refresh", $"refresh_server", style: ButtonStyle.Secondary)
+                .WithButton("Edit Time", $"editservertime", style: ButtonStyle.Secondary)
+                .Build());
+        }
 
         // "Refresh" button on /time
         public static async Task RefreshUserTime(this SocketMessageComponent command)
@@ -24,17 +35,22 @@ namespace TimeBot.Interactions
             // Custom Id: refresh_user-UserIdHere
             var user = await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
 
-            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(), true);
+            var embed = await StatsHandler.UserStatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(), true);
 
             // Update the message
-            await command.UpdateAsync(x =>
-            {
-                x.Embed = embed;
+            await command.UpdateAsync(x => { x.Embed = embed; });
+        }
 
-                x.Components = new ComponentBuilder()
-                    .WithButton("Refresh", $"refresh_user-{user.Id}", style: ButtonStyle.Secondary)
-                    .Build();
-            });
+        // "Refresh" button on /servertime
+        public static async Task RefreshServerTime(this SocketMessageComponent command)
+        {
+            // Custom Id: refresh_server
+            var guild = ((SocketGuildUser)command.User).Guild;
+
+            var embed = await StatsHandler.ServerStatsEmbed(GuildAccounts.GetAccount(guild.Id), guild, true);
+
+            // Update the embed
+            await command.UpdateAsync(x => { x.Embed = embed; });
         }
 
         // /country (SocketGuildUser)
@@ -48,7 +64,7 @@ namespace TimeBot.Interactions
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
-                .WithColor(await Utilities.GetUserColor(avatarURL))
+                .WithColor(await Utilities.GetImageColor(avatarURL))
                 .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
@@ -64,7 +80,7 @@ namespace TimeBot.Interactions
                 .WithAuthor(new EmbedAuthorBuilder()
                     .WithName(user.Nickname ?? user.Username)
                     .WithIconUrl(avatarURL))
-                .WithColor(await Utilities.GetUserColor(avatarURL))
+                .WithColor(await Utilities.GetImageColor(avatarURL))
                 .WithDescription(country == "" ? "No country has been set up. Do `/countryset [country name]` to set your country.\n\nExample: `/countryset canada`" : country)
                 .Build());
         }
@@ -605,12 +621,33 @@ namespace TimeBot.Interactions
                 else
                     data += $",{TimeZones.List.IndexOf(timeZoneId)}";
 
+                var serverTimeZone = GuildAccounts.GetAccount(((SocketGuildUser)buttonCommand.User).Guild.Id).timeZoneId;
+                var serverTimeZoneText = serverTimeZone;
+                if (serverTimeZoneText != "Not set.")
+                {
+                    var timeZoneInfo = new TimeZone(serverTimeZone);
+                    serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
+                }
+
                 await buttonCommand.UpdateAsync(x =>
                 {
                     x.Embed = new EmbedBuilder()
-                        .WithTitle("Current Time by Timezone")
-                        .WithDescription(
-                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                        .WithTitle("Current Time by TimeZone")
+                        .WithFields(new List<EmbedFieldBuilder>()
+                        {
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Server Time",
+                                Value = serverTimeZoneText,
+                                IsInline = false
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "TimeZones",
+                                Value = TimeZones.GetTimeZoneTimes(data),
+                                IsInline = false
+                            }
+                        })
                         .WithColor(Utilities.Blue)
                         .Build();
 
@@ -628,12 +665,34 @@ namespace TimeBot.Interactions
         public static async Task UpdateTimezones(this SocketMessageComponent command)
         {
             var data = command.Data.CustomId.Split("-")[1];
+
+            var serverTimeZone = GuildAccounts.GetAccount(((SocketGuildUser)command.User).Guild.Id).timeZoneId;
+            var serverTimeZoneText = serverTimeZone;
+            if (serverTimeZoneText != "Not set.")
+            {
+                var timeZoneInfo = new TimeZone(serverTimeZone);
+                serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
+            }
+
             await command.UpdateAsync(x =>
                 {
                     x.Embed = new EmbedBuilder()
-                        .WithTitle("Current Time by Timezone")
-                        .WithDescription(
-                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                        .WithTitle("Current Time by TimeZone")
+                        .WithFields(new List<EmbedFieldBuilder>()
+                        {
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "Server Time",
+                                Value = serverTimeZoneText,
+                                IsInline = false
+                            },
+                            new EmbedFieldBuilder()
+                            {
+                                Name = "TimeZones",
+                                Value = TimeZones.GetTimeZoneTimes(data),
+                                IsInline = false
+                            }
+                        })
                         .WithColor(Utilities.Blue)
                         .Build();
 
@@ -684,6 +743,75 @@ namespace TimeBot.Interactions
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+
+        // "Edit Time" button on /servertime
+        public static async Task EditServerTime(this SocketMessageComponent buttonCommand)
+        {
+            /// Check if they're an admin
+            if (!((SocketGuildUser)buttonCommand.User).GuildPermissions.Administrator)
+            {
+                await buttonCommand.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription("You do not have permission to use this command.")
+                    .WithColor(Utilities.Red)
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            var embed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithDescription($"Please select the timezone 😀\n\nIf you need help please join the Support Server: {Utilities.SupportServer}")
+                .Build();
+
+            if (buttonCommand.Data.CustomId == "editservertime")
+            {
+                await buttonCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)buttonCommand.User).Guild.Id.ToString(), "server"), ephemeral: true);
+                return;
+            }
+
+            var args = buttonCommand.Data.CustomId.Split("_");
+
+            var target = args[2];
+
+            // Previous and Next Page buttons
+            if (buttonCommand.Data.CustomId.StartsWith("serverlastpage"))
+            {
+                await buttonCommand.UpdateAsync(x =>
+                {
+                    x.Embed = embed;
+                    x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, target, "server");
+                });
+                return;
+            }
+            else if (buttonCommand.Data.CustomId.StartsWith("servernextpage"))
+            {
+                await buttonCommand.UpdateAsync(x =>
+                {
+                    x.Embed = embed;
+                    x.Components =
+                        TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, target, "server");
+                });
+                return;
+            }
+
+            var guild = ((SocketGuildUser)buttonCommand.User).Guild;
+
+            // Clicked a timezone button
+            var account = GuildAccounts.GetAccount(guild.Id);
+            account.timeZoneId = args[2];
+            GuildAccounts.SaveAccounts();
+
+            await buttonCommand.UpdateAsync(x =>
+            {
+                x.Embed = new EmbedBuilder()
+                    .WithTitle("Success")
+                    .WithDescription(
+                        $"You have succesfully set the server's time.\n\n{StatsHandler.GetTime(account, guild.Name)}\n\nIf the time is wrong, try again. Click the `Edit Time` button again.")
+                    .WithColor(Utilities.Green)
+                    .Build();
+                x.Components = null;
+            });
         }
     }
 }

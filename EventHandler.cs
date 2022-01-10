@@ -40,7 +40,7 @@ namespace TimeBot
                 // User Command (context menu)
                 case SocketUserCommand userCommand:
                     var user = (SocketGuildUser)userCommand.Data.Member;
-                    await userCommand.RespondAsync(embed: await StatsHandler.StatsEmbed(
+                    await userCommand.RespondAsync(embed: await StatsHandler.UserStatsEmbed(
                         UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username,
                         user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()),
                         component: new ComponentBuilder().WithButton("Refresh", $"refresh_user-{userCommand.Data.Member.Id}", style: ButtonStyle.Secondary).Build());
@@ -55,6 +55,14 @@ namespace TimeBot
                     // /time "Refresh" button
                     else if (buttonCommand.Data.CustomId.StartsWith("refresh_user"))
                         await buttonCommand.RefreshUserTime();
+
+                    // /servertime "Refresh" button
+                    else if (buttonCommand.Data.CustomId == "refresh_server")
+                        await buttonCommand.RefreshServerTime();
+
+                    // /servertime "Edit Time" button
+                    else if (buttonCommand.Data.CustomId == "editservertime" || buttonCommand.Data.CustomId.StartsWith("server"))
+                        await buttonCommand.EditServerTime();
 
                     // /set-user-time timezone selection
                     else if (buttonCommand.Data.CustomId.StartsWith("other"))

@@ -27,12 +27,20 @@ namespace TimeBot
         /// <summary>
         /// Get the average color for a user's profile picture
         /// </summary>
-        public static async Task<Color> GetUserColor(string avatarURL)
+        public static async Task<Color> GetImageColor(string avatarURL)
         {
-            using (var ms = new MemoryStream(await HttpClient.GetByteArrayAsync(avatarURL)))
+            try
             {
-                var palette = DominantColorFinder.GetPalette((SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms));
-                return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
+                using (var ms = new MemoryStream(await HttpClient.GetByteArrayAsync(avatarURL)))
+                {
+                    var palette = DominantColorFinder.GetPalette((SixLabors.ImageSharp.Image<Rgba32>)SixLabors.ImageSharp.Image.Load(ms));
+                    return new Color(Convert.ToInt16(palette.Average(a => a.Color.R)), Convert.ToInt16(palette.Average(a => a.Color.G)), Convert.ToInt16(palette.Average(a => a.Color.B)));
+                }
+            }
+            catch
+            {
+                // Just return this color
+                return new Color(32, 34, 37);
             }
         }
 

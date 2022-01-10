@@ -13,9 +13,9 @@ namespace TimeBot.Interactions
             {
                 case "time":
                     if (command.Data.Options == null)
-                        await command.ShowTime((SocketGuildUser)command.User);
+                        await command.ShowUserTime((SocketGuildUser)command.User);
                     else
-                        await command.ShowTime(await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
+                        await command.ShowUserTime(await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id));
                     break;
 
                 case "country":
@@ -59,6 +59,10 @@ namespace TimeBot.Interactions
 
                 case "timezones":
                     await command.AddTimeZone();
+                    break;
+
+                case "servertime":
+                    await command.ShowServerTime();
                     break;
 
                 default:
