@@ -24,7 +24,7 @@ namespace TimeBot.Interactions
             // Custom Id: refresh_user-UserIdHere
             var user = await EventHandler._socketClient.Rest.GetGuildUserAsync(((SocketGuildUser)command.User).Guild.Id, Convert.ToUInt64(command.Data.CustomId.Split('-')[1]));
 
-            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl());
+            var embed = await StatsHandler.StatsEmbed(UserAccounts.GetAccount(user.Id), user.Nickname ?? user.Username, user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl(), true);
 
             // Update the message
             await command.UpdateAsync(x =>
@@ -278,6 +278,8 @@ namespace TimeBot.Interactions
                     case SocketMessageComponent button:
                         var data = button.Data.CustomId.Split("_");
 
+                        firstEmbed = firstEmbed.ToEmbedBuilder().WithDescription(Utilities.GetRefreshedTimeText()).Build();
+
                         // 3 data meaans we have a first message id
                         if (data.Count() == 3)
                         {
@@ -350,22 +352,17 @@ namespace TimeBot.Interactions
         }
 
         // /timestats
-        public static async Task ShowStats(this SocketSlashCommand command)
-        {
-            var totalMembers = EventHandler._socketClient.Guilds.Sum(Guild => Guild.MemberCount);
-
-            await command.RespondAsync(embed: new EmbedBuilder()
-                .WithTitle("Bot Info")
-                .WithColor(Utilities.Blue)
-                .WithThumbnailUrl("https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128")
-                .AddField("Library", "Discord.Net.Labs")
-                .AddField("Servers", EventHandler._socketClient.Guilds.Count)
-                .AddField("Members", totalMembers.ToString("#,##0"))
-                .AddField("Developer", "Reverse#0069")
-                .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
-                .AddField("Links", $"[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server]({Utilities.SupportServer})")
-                .Build()).ConfigureAwait(false);
-        }
+        public static async Task ShowStats(this SocketSlashCommand command) => await command.RespondAsync(embed: new EmbedBuilder()
+            .WithTitle("Bot Info")
+            .WithColor(Utilities.Blue)
+            .WithThumbnailUrl("https://cdn.discordapp.com/avatars/529569000028373002/b5100de6821ee1c4714ac022c3cd39d9.png?size=128")
+            .AddField("Library", "Discord.Net.Labs")
+            .AddField("Servers", EventHandler._socketClient.Guilds.Count)
+            .AddField("Members", EventHandler._socketClient.Guilds.Sum(Guild => Guild.MemberCount).ToString("#,##0"))
+            .AddField("Developer", "Reverse#0069")
+            .AddField("Color", "Suggested Role Color for Me: `#7fa6d0`")
+            .AddField("Links", $"[Invite](https://discord.com/api/oauth2/authorize?client_id=529569000028373002&permissions=2048&scope=bot%20applications.commands) | [Vote](\n\nhttps://top.gg/bot/529569000028373002/vote) | [GitHub](https://github.com/WilliamWelsh/TimeBot) | [Support Server]({Utilities.SupportServer})")
+            .Build()).ConfigureAwait(false);
 
         // /timesetup
         public static async Task TimeSetupForSelf(this SocketInteraction interaction)
@@ -377,7 +374,7 @@ namespace TimeBot.Interactions
 
             if (interaction is SocketSlashCommand slashCommand)
             {
-                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, interaction.User.Id), ephemeral: true);
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, interaction.User.Id.ToString()), ephemeral: true);
             }
             else if (interaction is SocketMessageComponent buttonCommand)
             {
@@ -389,7 +386,7 @@ namespace TimeBot.Interactions
                     await buttonCommand.UpdateAsync(x =>
                     {
                         x.Embed = embed;
-                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User.Id);
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, interaction.User.Id.ToString());
                     });
                 }
                 else if (buttonCommand.Data.CustomId.StartsWith("nextpage"))
@@ -400,7 +397,7 @@ namespace TimeBot.Interactions
                         {
                             x.Embed = embed;
                             x.Components =
-                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, interaction.User.Id);
+                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, interaction.User.Id.ToString());
                         });
                     }
                     catch (Exception e)
@@ -491,7 +488,7 @@ namespace TimeBot.Interactions
 
             if (interaction is SocketSlashCommand slashCommand)
             {
-                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)slashCommand.Data.Options.ElementAt(0).Value).Id, true), ephemeral: true);
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, ((SocketGuildUser)slashCommand.Data.Options.ElementAt(0).Value).Id.ToString(), "other"), ephemeral: true);
             }
             else if (interaction is SocketMessageComponent buttonCommand)
             {
@@ -505,24 +502,19 @@ namespace TimeBot.Interactions
                     await buttonCommand.UpdateAsync(x =>
                     {
                         x.Embed = embed;
-                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, Convert.ToUInt64(target), true);
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, target, "other");
                     });
+                    return;
                 }
                 else if (buttonCommand.Data.CustomId.StartsWith("othernextpage"))
                 {
-                    try
+                    await buttonCommand.UpdateAsync(x =>
                     {
-                        await buttonCommand.UpdateAsync(x =>
-                        {
-                            x.Embed = embed;
-                            x.Components =
-                                TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, Convert.ToUInt64(target), true);
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+                        x.Embed = embed;
+                        x.Components =
+                            TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, target, "other");
+                    });
+                    return;
                 }
 
                 // Clicked a timezone button
@@ -540,6 +532,157 @@ namespace TimeBot.Interactions
                         .Build();
                     x.Components = null;
                 });
+            }
+        }
+
+        /// <summary>
+        /// Add a timezone to /timezone
+        /// </summary>
+        public static async Task AddTimeZone(this SocketInteraction interaction)
+        {
+            /// Check if they're an admin
+            if (!((SocketGuildUser)interaction.User).GuildPermissions.Administrator)
+            {
+                await interaction.RespondAsync(embed: new EmbedBuilder()
+                    .WithTitle("Error")
+                    .WithDescription("Only admins can add timezones.")
+                    .WithColor(Utilities.Red)
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            var embed = new EmbedBuilder()
+                .WithColor(Utilities.Blue)
+                .WithDescription($"Please select the timezone 😀\n\nIf you need help please join the Support Server: {Utilities.SupportServer}")
+                .Build();
+
+            if (interaction is SocketSlashCommand slashCommand)
+            {
+                await slashCommand.RespondAsync(embed: embed, component: TimeZones.GetPaginatedTimeZones(0, "none", "addtimezone"));
+            }
+            else if (interaction is SocketMessageComponent buttonCommand)
+            {
+                var args = buttonCommand.Data.CustomId.Split("_");
+
+                var data = args[1];
+
+                if (buttonCommand.Data.CustomId.StartsWith("addanothertimezone"))
+                {
+                    await buttonCommand.UpdateAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components = TimeZones.GetPaginatedTimeZones(0, data, "addtimezone");
+                    });
+                    return;
+                }
+
+                // Previous and Next Page buttons
+                if (buttonCommand.Data.CustomId.StartsWith("addtimezonelastpage"))
+                {
+                    await buttonCommand.UpdateAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components = TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) - 1, args[2], "addtimezone");
+                    });
+                    return;
+                }
+                else if (buttonCommand.Data.CustomId.StartsWith("addtimezonenextpage"))
+                {
+                    await buttonCommand.UpdateAsync(x =>
+                    {
+                        x.Embed = embed;
+                        x.Components =
+                            TimeZones.GetPaginatedTimeZones(Convert.ToInt32(args[1]) + 1, args[2], "addtimezone");
+                    });
+                    return;
+                }
+
+                // Clicked a timezone button
+                var timeZoneId = args[2];
+
+                if (data == "none")
+                    data = $"{TimeZones.List.IndexOf(timeZoneId)}";
+                else
+                    data += $",{TimeZones.List.IndexOf(timeZoneId)}";
+
+                await buttonCommand.UpdateAsync(x =>
+                {
+                    x.Embed = new EmbedBuilder()
+                        .WithTitle("Current Time by Timezone")
+                        .WithDescription(
+                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                        .WithColor(Utilities.Blue)
+                        .Build();
+
+                    x.Components = new ComponentBuilder()
+                        .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
+                        .WithButton("Edit Timezones", $"edittimezones_{data}", ButtonStyle.Secondary)
+                        .Build();
+                });
+            }
+        }
+
+        /// <summary>
+        /// Refresh button on /timezones
+        /// </summary>
+        public static async Task UpdateTimezones(this SocketMessageComponent command)
+        {
+            var data = command.Data.CustomId.Split("-")[1];
+            await command.UpdateAsync(x =>
+                {
+                    x.Embed = new EmbedBuilder()
+                        .WithTitle("Current Time by Timezone")
+                        .WithDescription(
+                            $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                        .WithColor(Utilities.Blue)
+                        .Build();
+
+                    x.Components = new ComponentBuilder()
+                        .WithButton("Refresh", $"refresh_timezones-{data}", ButtonStyle.Secondary)
+                        .WithButton("Edit Timezones", $"edittimezones_{data}", ButtonStyle.Secondary)
+                        .Build();
+                });
+        }
+
+        /// <summary>
+        /// The "Edit Timezones" button on /timezones
+        /// </summary>
+        public static async Task ShowEditMenuForTimeZonesCommand(this SocketMessageComponent command)
+        {
+            try
+            {
+                /// Check if they're an admin
+                if (!((SocketGuildUser)command.User).GuildPermissions.Administrator)
+                {
+                    await command.RespondAsync(embed: new EmbedBuilder()
+                        .WithTitle("Error")
+                        .WithDescription("Only admins can add timezones.")
+                        .WithColor(Utilities.Red)
+                        .Build(), ephemeral: true);
+                    return;
+                }
+
+                var data = command.Data.CustomId.Split("_")[1];
+                await command.UpdateAsync(x =>
+                    {
+                        x.Embed = new EmbedBuilder()
+                            .WithTitle("Current Time by Timezone")
+                            .WithDescription(
+                                $"{Utilities.GetRefreshedTimeText()}\n\n{TimeZones.GetTimeZoneTimes(data)}")
+                            .WithColor(Utilities.Blue)
+                            .Build();
+
+                        x.Components = new ComponentBuilder()
+                            .WithButton("Add Timezone", $"addanothertimezone_{data}", ButtonStyle.Secondary)
+                            .WithButton("Remove Timezone", $"removetimezone_{data}", ButtonStyle.Secondary, disabled: true)
+                            .WithButton("Cancel", $"refresh_timezones-{data}", ButtonStyle.Secondary)
+                            .Build();
+                    });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
             }
         }
     }

@@ -57,6 +57,10 @@ namespace TimeBot.Interactions
                     await command.SetTimeForSomeoneElse();
                     break;
 
+                case "timezones":
+                    await command.AddTimeZone();
+                    break;
+
                 default:
                     break;
             }

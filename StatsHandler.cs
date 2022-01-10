@@ -7,11 +7,11 @@ namespace TimeBot
     public static class StatsHandler
     {
         // Get their stats as an embed
-        public static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL) => new EmbedBuilder()
+        public static async Task<Embed> StatsEmbed(UserAccount account, string name, string avatarURL, bool appendRefreshTime = false) => new EmbedBuilder()
             .WithAuthor(new EmbedAuthorBuilder()
                 .WithName(name)
                 .WithIconUrl(avatarURL))
-            .WithDescription($"{GetTime(account, name)}")
+            .WithDescription($"{(appendRefreshTime ? $"{Utilities.GetRefreshedTimeText()}\n\n" : "")}{GetTime(account, name)}")
             .WithColor(await Utilities.GetUserColor(avatarURL))
             .WithFooter($"{GetCountry(account, true)}{account.timeZoneId}")
             .Build();
