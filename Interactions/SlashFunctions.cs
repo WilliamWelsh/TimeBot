@@ -678,6 +678,7 @@ namespace TimeBot.Interactions
                 {
                     x.Embed = new EmbedBuilder()
                         .WithTitle("Current Time by TimeZone")
+                        .WithDescription(Utilities.GetRefreshedTimeText())
                         .WithFields(new List<EmbedFieldBuilder>()
                         {
                             new EmbedFieldBuilder()
