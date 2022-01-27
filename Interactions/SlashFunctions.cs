@@ -629,10 +629,16 @@ namespace TimeBot.Interactions
                     serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
                 }
 
+                var guild = ((SocketGuildUser)buttonCommand.User).Guild;
+
+                var color = await Utilities.GetImageColor(guild.IconUrl);
+
                 await buttonCommand.UpdateAsync(x =>
                 {
                     x.Embed = new EmbedBuilder()
-                        .WithTitle("Current Time by TimeZone")
+                        .WithAuthor(new EmbedAuthorBuilder()
+                            .WithName("Current Time by TimeZone")
+                            .WithIconUrl(guild.IconUrl))
                         .WithFields(new List<EmbedFieldBuilder>()
                         {
                             new EmbedFieldBuilder()
@@ -648,7 +654,7 @@ namespace TimeBot.Interactions
                                 IsInline = false
                             }
                         })
-                        .WithColor(Utilities.Blue)
+                        .WithColor(color)
                         .Build();
 
                     x.Components = new ComponentBuilder()
@@ -674,10 +680,16 @@ namespace TimeBot.Interactions
                 serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
             }
 
+            var guild = ((SocketGuildUser)command.User).Guild;
+
+            var color = await Utilities.GetImageColor(guild.IconUrl);
+
             await command.UpdateAsync(x =>
                 {
                     x.Embed = new EmbedBuilder()
-                        .WithTitle("Current Time by TimeZone")
+                        .WithAuthor(new EmbedAuthorBuilder()
+                            .WithName("Current Time by TimeZone")
+                            .WithIconUrl(guild.IconUrl))
                         .WithDescription(Utilities.GetRefreshedTimeText())
                         .WithFields(new List<EmbedFieldBuilder>()
                         {
@@ -694,7 +706,7 @@ namespace TimeBot.Interactions
                                 IsInline = false
                             }
                         })
-                        .WithColor(Utilities.Blue)
+                        .WithColor(color)
                         .Build();
 
                     x.Components = new ComponentBuilder()
