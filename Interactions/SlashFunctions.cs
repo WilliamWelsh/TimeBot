@@ -621,14 +621,6 @@ namespace TimeBot.Interactions
                 else
                     data += $",{TimeZones.List.IndexOf(timeZoneId)}";
 
-                var serverTimeZone = GuildAccounts.GetAccount(((SocketGuildUser)buttonCommand.User).Guild.Id).timeZoneId;
-                var serverTimeZoneText = serverTimeZone;
-                if (serverTimeZoneText != "Not set.")
-                {
-                    var timeZoneInfo = new TimeZone(serverTimeZone);
-                    serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
-                }
-
                 var guild = ((SocketGuildUser)buttonCommand.User).Guild;
 
                 var color = await Utilities.GetImageColor(guild.IconUrl);
@@ -644,7 +636,7 @@ namespace TimeBot.Interactions
                             new EmbedFieldBuilder()
                             {
                                 Name = "Server Time",
-                                Value = serverTimeZoneText,
+                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name)}\n\u200B",
                                 IsInline = false
                             },
                             new EmbedFieldBuilder()
@@ -672,14 +664,6 @@ namespace TimeBot.Interactions
         {
             var data = command.Data.CustomId.Split("-")[1];
 
-            var serverTimeZone = GuildAccounts.GetAccount(((SocketGuildUser)command.User).Guild.Id).timeZoneId;
-            var serverTimeZoneText = serverTimeZone;
-            if (serverTimeZoneText != "Not set.")
-            {
-                var timeZoneInfo = new TimeZone(serverTimeZone);
-                serverTimeZoneText = $"**{timeZoneInfo.TimeZoneId}** {timeZoneInfo.RawTime.ToString("h:mm tt dddd, MMMM d")}";
-            }
-
             var guild = ((SocketGuildUser)command.User).Guild;
 
             var color = await Utilities.GetImageColor(guild.IconUrl);
@@ -696,7 +680,7 @@ namespace TimeBot.Interactions
                             new EmbedFieldBuilder()
                             {
                                 Name = "Server Time",
-                                Value = serverTimeZoneText,
+                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name)}\n\u200B",
                                 IsInline = false
                             },
                             new EmbedFieldBuilder()
