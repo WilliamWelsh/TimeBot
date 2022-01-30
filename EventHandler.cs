@@ -61,7 +61,8 @@ namespace TimeBot
                         await buttonCommand.RefreshServerTime();
 
                     // /servertime "Edit Time" button
-                    else if (buttonCommand.Data.CustomId == "editservertime" || buttonCommand.Data.CustomId.StartsWith("server"))
+                    else if (buttonCommand.Data.CustomId == "editservertime" ||
+                        buttonCommand.Data.CustomId.StartsWith("server"))
                         await buttonCommand.EditServerTime();
 
                     // /set-user-time timezone selection
@@ -83,6 +84,10 @@ namespace TimeBot
                     // /timezone "Edit Timezones" button
                     else if (buttonCommand.Data.CustomId.StartsWith("edittimezones"))
                         await buttonCommand.ShowEditMenuForTimeZonesCommand();
+
+                    else if (buttonCommand.Data.CustomId.StartsWith("refresh_tworole") ||
+                        buttonCommand.Data.CustomId.StartsWith("refresh_role"))
+                        await buttonCommand.ShowRoleTime();
 
                     // /timesetup timezone selection
                     else
