@@ -974,7 +974,7 @@ namespace TimeBot.Interactions
 
                 // Two messages to update
                 var message = (RestUserMessage)await button.Channel.GetMessageAsync(Convert.ToUInt64(args[2]));
-                await message.ModifyAsync(x => x.Embed = firstEmbed);
+                await message.ModifyAsync(x => x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n\n{firstLine}").Build());
                 await button.UpdateAsync(x =>
                 {
                     x.Embed = secondEmbed;
