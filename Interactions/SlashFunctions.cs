@@ -636,7 +636,7 @@ namespace TimeBot.Interactions
                             new EmbedFieldBuilder()
                             {
                                 Name = "Server Time",
-                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name)}\n\u200B",
+                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name, true)}\n\u200B",
                                 IsInline = false
                             },
                             new EmbedFieldBuilder()
@@ -680,7 +680,7 @@ namespace TimeBot.Interactions
                             new EmbedFieldBuilder()
                             {
                                 Name = "Server Time",
-                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name)}\n\u200B",
+                                Value = $"{StatsHandler.GetTime(GuildAccounts.GetAccount(guild.Id), guild.Name, true)}\n\u200B",
                                 IsInline = false
                             },
                             new EmbedFieldBuilder()

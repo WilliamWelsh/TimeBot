@@ -36,12 +36,12 @@ namespace TimeBot
         }
 
         // Display a Servers's local time
-        public static string GetTime(GuildAccount account, string name)
+        public static string GetTime(GuildAccount account, string name, bool showTimeZone = false)
         {
             if (account.timeZoneId == "Not set.")
                 return $"No time set for {name}.\nClick the `Edit Time` button to edit the server time.";
             var localTime = TimeZones.GetRawTimeByTimeZone(account.timeZoneId);
-            return $"It's {localTime:h:mm tt} for {name}.\n{localTime:dddd, MMMM d.}";
+            return $"It's {localTime:h:mm tt} for {name}.\n{localTime:dddd, MMMM d.}{(showTimeZone ? $"\n{account.timeZoneId}" : "")}";
         }
 
         // Display a User's country
