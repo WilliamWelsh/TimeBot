@@ -907,16 +907,11 @@ namespace TimeBot.Interactions
             var firstLine = new StringBuilder();
             var secondLine = new StringBuilder();
 
-            var lastTime = sortedList.ElementAt(0).Time;
             foreach (var item in sortedList)
             {
-                var text = $"{item.User.Nickname ?? item.User.Username} - {TimeZones.GetTimeByTimeZone(item.UserAccount.timeZoneId)}";
+                var time = item.UserAccount.timeZoneId == "Not set." ? "Not set." : $"It's {TimeZones.GetRawTimeByTimeZone(item.UserAccount.timeZoneId):h:mm tt, dddd, MMMM d}";
 
-                if (lastTime != item.Time)
-                {
-                    lastTime = item.Time;
-                    text = $"\n{text}";
-                }
+                var text = $"\n**{item.User.Nickname ?? item.User.Username}**\n{time}{(item.UserAccount.timeZoneId == "Not set." ? "" : $"\n{item.UserAccount.timeZoneId}")}";
 
                 if (firstLine.ToString().Length < 1800)
                     firstLine.AppendLine(text);
@@ -953,7 +948,7 @@ namespace TimeBot.Interactions
                 }
 
                 await command.RespondAsync("You have so many members that it couldn't fit in one message, so I sent two 😀", ephemeral: true);
-                var firstMessage = await command.Channel.SendMessageAsync(embed: firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n\n{firstLine}").Build());
+                var firstMessage = await command.Channel.SendMessageAsync(embed: firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build());
                 await command.Channel.SendMessageAsync(embed: secondEmbed,
                 component: new ComponentBuilder()
                     .WithButton("Refresh", $"refresh_tworole-{role.Id}-{firstMessage.Id}", ButtonStyle.Secondary)
@@ -966,7 +961,7 @@ namespace TimeBot.Interactions
                 {
                     await button.UpdateAsync(x =>
                     {
-                        x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n\n{firstLine}").Build();
+                        x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build();
                         x.Components = regularRefreshButton;
                     });
                     return;
@@ -974,7 +969,7 @@ namespace TimeBot.Interactions
 
                 // Two messages to update
                 var message = (RestUserMessage)await button.Channel.GetMessageAsync(Convert.ToUInt64(args[2]));
-                await message.ModifyAsync(x => x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n\n{firstLine}").Build());
+                await message.ModifyAsync(x => x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build());
                 await button.UpdateAsync(x =>
                 {
                     x.Embed = secondEmbed;
