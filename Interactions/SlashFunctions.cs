@@ -911,7 +911,7 @@ namespace TimeBot.Interactions
             {
                 var time = item.UserAccount.timeZoneId == "Not set." ? "Not set." : $"It's {TimeZones.GetRawTimeByTimeZone(item.UserAccount.timeZoneId):h:mm tt, dddd, MMMM d}";
 
-                var text = $"\n**{item.User.Nickname ?? item.User.Username}**\n{time}{(item.UserAccount.timeZoneId == "Not set." ? "" : $"\n{item.UserAccount.timeZoneId}")}";
+                var text = $"\n**{item.User.Nickname ?? item.User.Username}**\n{time}{(item.UserAccount.timeZoneId == "Not set." ? "" : $"\n{item.UserAccount.timeZoneId}")}{(item.UserAccount.country == "Not set." ? "" : "\n" + item.UserAccount.country)}";
 
                 if (firstLine.ToString().Length < 1800)
                     firstLine.AppendLine(text);
