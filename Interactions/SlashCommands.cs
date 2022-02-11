@@ -69,6 +69,10 @@ namespace TimeBot.Interactions
                     await command.ShowRoleTime();
                     break;
 
+                case "rolemembers":
+                    await command.ShowRoleMembers();
+                    break;
+
                 default:
                     break;
             }

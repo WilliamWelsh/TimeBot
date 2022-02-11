@@ -979,5 +979,172 @@ namespace TimeBot.Interactions
                 });
             }
         }
+
+        // /rolemembers
+        public static async Task ShowRoleMembers(this SocketInteraction interaction)
+        {
+            var guild = ((SocketGuildUser)interaction.User).Guild;
+
+            SocketRole role = null;
+
+            string[] args = null;
+
+            if (interaction is SocketSlashCommand slashCommand)
+            {
+                try
+                {
+                    role = guild.Roles.Where(r => r.Name == slashCommand.Data.Options.ElementAt(0).Value.ToString()).First();
+                }
+                catch
+                {
+                    await interaction.RespondAsync(embed: new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder().WithName("Error"))
+                        .WithColor(Utilities.Red)
+                        .WithDescription($"I couldn't find that role. Please try again or join the support server if there's an error: {Utilities.SupportServer}")
+                        .Build(), ephemeral: true);
+                    return;
+                }
+
+                if (role.Name == "@everyone")
+                {
+                    await interaction.RespondAsync(embed: new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder().WithName("Error"))
+                        .WithColor(Utilities.Red)
+                        .WithDescription("Did you really just try to use `/rolemembers` on @everyone? 💀💀 That's too many people. Sorry.")
+                        .Build(), ephemeral: true);
+                    return;
+                }
+            }
+
+            if (interaction is SocketMessageComponent buttonCommand)
+            {
+                args = buttonCommand.Data.CustomId.Split("-");
+                try
+                {
+                    role = guild.Roles.Where(r => r.Id == Convert.ToUInt64(args[1])).First();
+                }
+                catch
+                {
+                    await interaction.RespondAsync(embed: new EmbedBuilder()
+                        .WithAuthor(new EmbedAuthorBuilder().WithName("Error"))
+                        .WithColor(Utilities.Red)
+                        .WithDescription($"I couldn't find that role. Please try again or join the support server if there's an error: {Utilities.SupportServer}")
+                        .Build(), ephemeral: true);
+                    return;
+                }
+            }
+
+            var Users = (await EventHandler._socketClient.Rest.GetGuildAsync(guild.Id)).GetUsersAsync();
+            var validAccounts = new List<ListItem>();
+
+            await foreach (var List in Users)
+            {
+                foreach (var User in List.Where(u => u.RoleIds.Contains(role.Id)))
+                {
+                    var account = UserAccounts.GetAccount(User.Id);
+                    validAccounts.Add(new ListItem
+                    {
+                        User = User,
+                        UserAccount = account,
+                        Time = TimeZones.GetRawTimeByTimeZone(account.timeZoneId)
+                    });
+                }
+            }
+
+            if (validAccounts.Count > 250)
+            {
+                await interaction.RespondAsync(embed: new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder().WithName("Error"))
+                    .WithColor(Utilities.Red)
+                    .WithDescription($"There are way too many people in that role. Please try again or join the support server if there's an error: {Utilities.SupportServer}")
+                    .Build(), ephemeral: true);
+                return;
+            }
+            else if (validAccounts.Count == 0)
+            {
+                await interaction.RespondAsync(embed: new EmbedBuilder()
+                    .WithAuthor(new EmbedAuthorBuilder().WithName("Error"))
+                    .WithColor(Utilities.Red)
+                    .WithDescription($"There are no users in that role... Please try again or join the support server if there's an error: {Utilities.SupportServer}")
+                    .Build(), ephemeral: true);
+                return;
+            }
+
+            // Sort by earliest time to latest
+            var sortedList = validAccounts.OrderBy(u => u.User.Nickname ?? u.User.Username);
+
+            var firstLine = new StringBuilder();
+            var secondLine = new StringBuilder();
+
+            foreach (var item in sortedList)
+            {
+                var text = item.User.Nickname ?? item.User.Username;
+
+                if (firstLine.ToString().Length < 1800)
+                    firstLine.AppendLine(text);
+                else
+                    secondLine.AppendLine(text);
+            }
+
+            var firstEmbed = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                    .WithName($"{role.Name} ({validAccounts.Count})")
+                    .WithIconUrl(role.Guild.IconUrl))
+                .WithColor(role.Color)
+                .WithDescription(firstLine.ToString())
+                .Build();
+
+            var secondEmbed = new EmbedBuilder()
+                .WithAuthor(new EmbedAuthorBuilder()
+                    .WithName($"{role.Name}")
+                    .WithIconUrl(role.Guild.IconUrl))
+                .WithColor(role.Color)
+                .WithDescription(secondLine.ToString())
+                .Build();
+
+            var regularRefreshButton = new ComponentBuilder()
+                .WithButton("Refresh", $"refresh_membersrole-{role.Id}", ButtonStyle.Secondary)
+                .Build();
+
+            if (interaction is SocketSlashCommand command)
+            {
+                if (secondLine.ToString().Length == 0)
+                {
+                    await command.RespondAsync(embed: firstEmbed, component: regularRefreshButton);
+                    return;
+                }
+
+                await command.RespondAsync("You have so many members that it couldn't fit in one message, so I sent two 😀", ephemeral: true);
+                var firstMessage = await command.Channel.SendMessageAsync(embed: firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build());
+                await command.Channel.SendMessageAsync(embed: secondEmbed,
+                component: new ComponentBuilder()
+                    .WithButton("Refresh", $"refresh_twomembersrole-{role.Id}-{firstMessage.Id}", ButtonStyle.Secondary)
+                    .Build());
+            }
+            else if (interaction is SocketMessageComponent button)
+            {
+                // Just one messsage to update
+                if (args.Count() == 2)
+                {
+                    await button.UpdateAsync(x =>
+                    {
+                        x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build();
+                        x.Components = regularRefreshButton;
+                    });
+                    return;
+                }
+
+                // Two messages to update
+                var message = (RestUserMessage)await button.Channel.GetMessageAsync(Convert.ToUInt64(args[2]));
+                await message.ModifyAsync(x => x.Embed = firstEmbed.ToEmbedBuilder().WithDescription($"{Utilities.GetRefreshedTimeText()}\n{firstLine}").Build());
+                await button.UpdateAsync(x =>
+                {
+                    x.Embed = secondEmbed;
+                    x.Components = new ComponentBuilder()
+                    .WithButton("Refresh", $"refresh_twomembersrole-{role.Id}-{args[2]}", ButtonStyle.Secondary)
+                    .Build();
+                });
+            }
+        }
     }
 }

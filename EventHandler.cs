@@ -85,9 +85,14 @@ namespace TimeBot
                     else if (buttonCommand.Data.CustomId.StartsWith("edittimezones"))
                         await buttonCommand.ShowEditMenuForTimeZonesCommand();
 
+                    // roletime and the refresh button
                     else if (buttonCommand.Data.CustomId.StartsWith("refresh_tworole") ||
                         buttonCommand.Data.CustomId.StartsWith("refresh_role"))
                         await buttonCommand.ShowRoleTime();
+
+                    else if (buttonCommand.Data.CustomId.StartsWith("refresh_twomembersrole") ||
+                    buttonCommand.Data.CustomId.StartsWith("refresh_membersrole"))
+                        await buttonCommand.ShowRoleMembers();
 
                     // /timesetup timezone selection
                     else
