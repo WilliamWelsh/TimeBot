@@ -199,15 +199,16 @@ namespace TimeBot.Interactions
 
                     // Split the description into two field if it's too long
                     var descriptionTwo = "";
-                    if (description.Length > 950) // Max is 1024 charcters per field
+                    if (description.Length > 900) // Max is 1024 charcters per field
                     {
                         var items = description.Split('\n');
-                        description = string.Join("\n", items.Take(items.Count() - 5));
-                        descriptionTwo = string.Join("\n", items.Skip(items.Count() - 5));
+                        description = string.Join("\n", items.Take(items.Count() - 10));
+                        descriptionTwo = string.Join("\n", items.Skip(items.Count() - 10));
                     }
 
                     if (firstFieldList.Count < 24)
                     {
+                        // Console.WriteLine("First " + description.Length);
                         firstFieldList.Add(new EmbedFieldBuilder()
                             .WithName($"{actualCountryName} {flagEmoji}")
                             .WithValue(description)
@@ -225,6 +226,7 @@ namespace TimeBot.Interactions
                     }
                     else
                     {
+                        // Console.WriteLine("Second " + description.Length);
                         secondFieldList.Add(new EmbedFieldBuilder()
                             .WithName($"{actualCountryName} {flagEmoji}")
                             .WithValue(description)
@@ -323,7 +325,7 @@ namespace TimeBot.Interactions
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.Source);
+                Console.WriteLine(e.StackTrace);
             }
         }
 
