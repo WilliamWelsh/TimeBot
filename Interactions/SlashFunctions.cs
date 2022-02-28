@@ -202,8 +202,8 @@ namespace TimeBot.Interactions
                     if (description.Length > 900) // Max is 1024 charcters per field
                     {
                         var items = description.Split('\n');
-                        description = string.Join("\n", items.Take(items.Count() - 10));
-                        descriptionTwo = string.Join("\n", items.Skip(items.Count() - 10));
+                        description = string.Join("\n", items.Take(items.Count() - 25));
+                        descriptionTwo = string.Join("\n", items.Skip(items.Count() - 25));
                     }
 
                     if (firstFieldList.Count < 24)
