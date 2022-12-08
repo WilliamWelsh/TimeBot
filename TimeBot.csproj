@@ -12,7 +12,7 @@
     <PackageReference Include="Discord.Net.Labs.Rest" Version="3.1.1" />
     <PackageReference Include="Discord.Net.Labs.WebSocket" Version="3.1.1" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
   </ItemGroup>
 </Project>
